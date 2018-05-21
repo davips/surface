@@ -141,7 +141,7 @@ def evalu_sum(g, xys, zs):
     return sum([abs(a - b) for a, b in zip(zs, predzs)])
 
 
-def evalu_var(g, xys, zs):
+def evalu_var(g, xys):
     predzs, stds = g.predict(xys, return_std=True)
     return sum(stds)
 
@@ -181,4 +181,12 @@ def p(plt, fig, f, n, zmin, zmax, filename=None):
     # plt.show()
     fig.canvas.flush_events()  # update the plot and take care of window events (like resizing etc.)
     time.sleep(0.2)
+    pl.remove()
+
+
+def plot_path(plt, fig, points, tour):
+    plotx, ploty = zip(*[points[idx] for idx in tour])
+    pl, = plt.plot(plotx, ploty, 'xb-')
+    fig.canvas.flush_events()  # update the plot and take care of window events (like resizing etc.)
+    time.sleep(0.5)
     pl.remove()
