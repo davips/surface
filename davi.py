@@ -4,7 +4,6 @@ from numpy.random import normal
 import matplotlib.pyplot as plt
 import time
 
-BUDGET = 10
 TSxy, TSz = test_data()
 
 # whether it is dynamic (or static)
@@ -17,31 +16,25 @@ depot = -0.0000001, -0.0000001
 
 # create empty list N for new points
 Nxy, Nz = [], []
-Probesxy, Probesz = [], []
 
 # prepare plotter
 plt.ion()
 fig = plt.figure(num='surface')
 minvar = 9999999
 
-# Probesxy, Probesz = Probesxy + [(hx, hy)], Probesz + [f5(hx, hy)]
+trip = Trip(depot, Pxy, Pz)
 
 while True:
-    feasible = True
-    while feasible:
-        # select best kernel and run GP on list P ++ N
-        g = kernel_selection(Pxy + Nxy, Pz + Nz)
+    while trip.isfeasible():
 
-        #   add point h with highest variance to the list N (with simulated probing as z value)
-        (hx, hy), hz, hstd = max_var(g)
-        if dynamic: hz = f5(hx, hy)
-        # print(fmt(hx), '\t', fmt(hy), '\t', fmt(hz), '\t', hstd, '\tcurrent max variance point')
-        Nxy, Nz = Nxy + [(hx, hy)], Nz + [hz]
+        # select best kernel and run GP on list P ++ N
+        trip.refit(Nxy, Nz)
+
+        # add point with highest variance to the list N (with simulated probing as z value)
+        trip.addmaxvar()
 
         # define a tour departing from depot
-        points = [depot] + Nxy
-        tour_, feasible, cost = plan_tour(points, BUDGET)
-        # path = [points[i] for i in tour_]
+        trip.plan_tour()
 
         if feasible:
             # store last succesful solution
@@ -69,7 +62,7 @@ while True:
             Nz.pop()
             points.pop()
 
-    # add depot to the beginning to allow triangulation (and correct indexes to match tour indexes)
+    # add depot to the beginning to allow triangulation (and to correct indexes to match tour indexes)
     Nxy = [depot] + Nxy
     Nz = [0] + Nz
 
@@ -130,3 +123,7 @@ show
 #
 #
 # tour = list(map(fu, tour))
+
+
+# Probesxy, Probesz = Probesxy + [(hx, hy)], Probesz + [f5(hx, hy)]
+# Probesxy, Probesz = [], []
