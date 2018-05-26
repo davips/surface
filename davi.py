@@ -1,116 +1,55 @@
+from plotter import Plotter
+from trip import *
 from aux import *
 from sys import argv
 from numpy.random import normal
-import matplotlib.pyplot as plt
 import time
-
-TSxy, TSz = test_data()
 
 # whether it is dynamic (or static)
 dynamic = argv[1] == 'dyn'
 if dynamic: print("Dynamic mode!")
 
-# generate list P with points from previous probing
+# generate: list P with points from previous probing and testing data
 Pxy, Pz = train_data()
-depot = -0.0000001, -0.0000001
+TSxy, TSz = test_data()
 
-# create empty list N for new points
-Nxy, Nz = [], []
+# objects initialization
+plotter = Plotter('surface')
+trip = Trip(Pxy, Pz, depot=(-0.0000001, -0.0000001), budget=10)
 
-# prepare plotter
-plt.ion()
-fig = plt.figure(num='surface')
-minvar = 9999999
-
-trip = Trip(depot, Pxy, Pz)
-
+var = 999999
 while True:
     while trip.isfeasible():
+        trip.add_maxvar_simulatedprobe()  # add point with highest variance
+    if trip.isfeasible(): tour = trip.gettour()  # store last succesful solution (a tour departing from depot)
 
-        # select best kernel and run GP on list P ++ N
-        trip.refit(Nxy, Nz)
+    plotter.path([depot] + trip.future_xys, tour)  # plot path or surface
+    # plotter.surface(f5, 30)
+    # plotter.surface(lambda x, y: g.predict([(x, y)])[0], 50, 0, 50)
+    # plotter.surface(lambda x, y: g.predict([(x, y)], return_std=True)[1][0], 30, 0.16, 0.18)
 
-        # add point with highest variance to the list N (with simulated probing as z value)
-        trip.addmaxvar()
+    var = trip.gettotal_var(TSxy)
+    ast = ''
+    if var < minvar:
+        minvar = var
+        ast = '*'
 
-        # define a tour departing from depot
-        trip.plan_tour()
+    print((type(g.kernel).__name__[:12]).expandtabs(13), '\ttour length=\t', len(tour_), '\tvar=\t' + fmt(var) + ast + '\terr=\t' + fmt(err) + '\tcost=\t' + fmt(cost))
+    # show_path([([depot] + Nxy)[i] for i in tour], '\tvar=\t' + fmt(var) + '\terr=\t' + fmt(err) + '\tcost=\t' + fmt(cost))
+else:
+    # drop last added, unfeasible, point
+    trip.droplast()
 
-        if feasible:
-            # store last succesful solution
-            tour = tour_
+while not trip.isfeasible():
+    trip.distort(random_distortion)
 
-            # plot path or surface
-            plot_path(plt, fig, points, tour_)
-            # p(plt, fig, f5, 30)
-            # p(plt, fig, lambda x, y: g.predict([(x, y)])[0], 50, 0, 50)
-            # p(plt, fig, lambda x, y: g.predict([(x, y)], return_std=True)[1][0], 30, 0.16, 0.18)
+# update pseudoprobings for the new positions
+trip.resimulate_probing()
+# TODO: this should be done automatically on demand
 
-            # evaluate (error sum, error max or var sum)
-            var = evalu_var(g, TSxy)
-            err = evalu_sum(g, TSxy, TSz)
-            ast = ''
-            if var < minvar:
-                minvar = var
-                ast = '*'
-
-            print((type(g.kernel).__name__[:12]).expandtabs(13), '\ttour length=\t', len(tour_), '\tvar=\t' + fmt(var) + ast + '\terr=\t' + fmt(err) + '\tcost=\t' + fmt(cost))
-            # show_path([([depot] + Nxy)[i] for i in tour], '\tvar=\t' + fmt(var) + '\terr=\t' + fmt(err) + '\tcost=\t' + fmt(cost))
-        else:
-            # drop last added, unfeasible, point
-            Nxy.pop()
-            Nz.pop()
-            points.pop()
-
-    # add depot to the beginning to allow triangulation (and to correct indexes to match tour indexes)
-    Nxy = [depot] + Nxy
-    Nz = [0] + Nz
-
-    while not feasible:
-        # modify almost all previous points, distorting them a bit at a time
-        for ida, idb, idc in zip(tour, tour[1:], tour[2:]):
-            (a, b), (c, d), (e, f) = points[ida], points[idb], points[idc]
-            m, n = (a + e) / 2, (b + f) / 2
-
-            # # no distortion
-            # x, y = c, d
-
-            # random distortion
-            s = 0.01 * (dist(a, b, c, d) + dist(c, d, e, f)) / 2
-            x, y = c + normal(scale=s), d + normal(scale=s)
-
-            # #   distortion towards median line = shortening the path
-            # # offset = 0.1 * (dist(a, b, c, d) + dist(c, d, e, f) - dist(a, b, e, f))
-            # p = 0.01
-            # x, y = c + p * (m - c), d + p * (n - d)
-
-            Nxy[idb] = x, y
-
-        # check feasibility
-        points = Nxy
-        tour, feasible, cost = plan_tour(points, BUDGET)
-
-    # update pseudoprobings for the new positions
-    g = kernel_selection(Pxy, Pz)
-    Nz = list(g.predict(Nxy))
-
-    # remove (temporarily added) depot
-    Nxy = Nxy[1:]
-    Nz = Nz[1:]
-
-    # evaluate fitness
-    g = kernel_selection(Pxy + Nxy, Pz + Nz)
-    var = evalu_var(g, TSxy)
-    print(var)
-
-# assess probing
-g = gp(Pxy + Nxy, Pz + Nz)
-
-# compare predictions to true resource levels
-result = evalu_sum(g, TSxy, TSz)
-print('Error=\t', fmt(result))
-print()
-show
+# evaluate fitness
+var = trip.gettotal_var(TSxy)
+print(var)
 
 # eliminate a point at random to allow the insertion of a new one
 # idx = random.randrange(len(Nxy))
