@@ -83,6 +83,14 @@ def max_var(g):
     stdmax, zmax, xymax = max(zip(stds, zs, xys))
     return xymax, zmax, stdmax
 
+def rnd(g):
+    xs = np.arange(0.0, 1.01, 1. / n)
+    ys = np.arange(0.0, 1.01, 1. / n)
+    xys = [(xs[i], ys[j]) for i in range(n + 1) for j in range(n + 1)]
+    zs, stds = g.predict(xys, return_std=True)
+    stdmax, zmax, xymax = random.choice(zip(stds, zs, xys))
+    return xymax, zmax, stdmax
+
 
 def dist(x1, y1, x2, y2):
     return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)

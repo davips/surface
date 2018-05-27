@@ -42,14 +42,17 @@ class Trip:
         if not self.ismodel_cached: self.refit(self.future_xys, self.future_zs)
         return self.model
 
-    def add_maxvar_simulatedprobe(self):
-        self.log('add max var')
-        hxy, hz, hstd = max_var(self.getmodel())
-        # if dynamic: hz = f5(hx, hy)
-        # print(fmt(hx), '\t', fmt(hy), '\t', fmt(hz), '\t', hstd, '\tcurrent max variance point')
+    def add(self, hxy, hz, hstd, txt):
+        self.log('add by ' + txt)
         self.future_xys, self.future_zs = self.future_xys + [hxy], self.future_zs + [hz]
         self.istour_cached = False
         self.ismodel_cached = False
+
+    def add_maxvar_simulatedprobe(self):
+        self.add(*max_var(self.getmodel()), 'max var')
+
+    def add_rnd_simulatedprobe(self):
+        self.add(*rnd(self.getmodel()), 'rnd')
 
     def calculate_tour(self):
         self.log('calc tour')

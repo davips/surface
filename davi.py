@@ -4,13 +4,16 @@ from aux import *
 from sys import argv
 import time
 
+at_random = argv[1] == 'rnd'
+if at_random: print("Random mode!")
+
 # generate: list P with points from previous probing and testing data
 (Pxy, Pz), (TSxy, TSz) = train_data(), test_data()
 
 # objects initialization
 plotter = Plotter('surface')
 depot = (-0.0000001, -0.0000001)
-trip = Trip(depot, Pxy, Pz, TSxy, budget=50, debug=not True)
+trip = Trip(depot, Pxy, Pz, TSxy, budget=15, debug=not True)
 
 minvar = 999999
 while True:
@@ -19,7 +22,7 @@ while True:
         plotter.path([depot] + trip.future_xys, tour)  # plot path or surface
         ast = '*' if trip.issmallest_var() else ''
         print((type(trip.getmodel().kernel).__name__[:12]).expandtabs(13), '\ttour length=\t', len(tour), '\tvar=\t' + fmt(trip.getvar()) + ast)  # + '\tcost=\t' + fmt(cost))
-        trip.add_maxvar_simulatedprobe()  # add point with highest variance
+        trip.add_rnd_simulatedprobe() if at_random else trip.add_maxvar_simulatedprobe()
     trip.undo_last_simulatedprobe()
 
     # Find feasible distortion.
