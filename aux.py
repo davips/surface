@@ -88,7 +88,7 @@ def rnd(g):
     ys = np.arange(0.0, 1.01, 1. / n)
     xys = [(xs[i], ys[j]) for i in range(n + 1) for j in range(n + 1)]
     zs, stds = g.predict(xys, return_std=True)
-    stdmax, zmax, xymax = random.choice(zip(stds, zs, xys))
+    stdmax, zmax, xymax = random.choice(list(zip(stds, zs, xys)))
     return xymax, zmax, stdmax
 
 
@@ -124,7 +124,8 @@ def plan_tour(xys, budget):
                 cost = complete_cost(cost, n)
                 sol = sequence(range(n), edges)
             else:
-                print('NOT trying exact solution')
+                pass
+                # print('NOT trying exact solution')
     elif n == 1:
         cost = 0
         sol = [0]

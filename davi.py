@@ -12,8 +12,8 @@ if at_random: print("Random mode!")
 
 # objects initialization
 plotter = Plotter('surface')
-depot = (-0.0000001, -0.0000001)
-trip = Trip(depot, Pxy, Pz, TSxy, budget=15, debug=not True)
+depot, attempts = (-0.0000001, -0.0000001), 10
+trip = Trip(depot, Pxy, Pz, TSxy, budget=30, debug=not True)
 
 minvar = 999999
 while True:
@@ -23,16 +23,18 @@ while True:
         ast = '*' if trip.issmallest_var() else ''
         print((type(trip.getmodel().kernel).__name__[:12]).expandtabs(13), '\ttour length=\t', len(tour), '\tvar=\t' + fmt(trip.getvar()) + ast)  # + '\tcost=\t' + fmt(cost))
         trip.add_rnd_simulatedprobe() if at_random else trip.add_maxvar_simulatedprobe()
-    trip.undo_last_simulatedprobe()
+        if not trip.isfeasible(): trip.undo_last_simulatedprobe()
 
     # Find feasible distortion.
     feasible = False
-    while not feasible:
+    c = 0
+    while not feasible and c < attempts:
         trip.distort(random_distortion)
         feasible = trip.isfeasible()
+        c += 1
 
     # update pseudoprobings for the new positions
-    trip.resimulate_probings()  # TODO: this should occur later automatically on demand
+    if feasible: trip.resimulate_probings()  # TODO: this should occur later automatically on demand
 
 # eliminate a point at random to allow the insertion of a new one
 # idx = random.randrange(len(Nxy))
@@ -54,9 +56,6 @@ while True:
 # plotter.surface(f5, 30)
 # plotter.surface(lambda x, y: g.predict([(x, y)])[0], 50, 0, 50)
 # plotter.surface(lambda x, y: g.predict([(x, y)], return_std=True)[1][0], 30, 0.16, 0.18)
-
-
-
 
 
 # # whether it is dynamic (or static)
