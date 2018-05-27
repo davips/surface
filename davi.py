@@ -15,41 +15,44 @@ TSxy, TSz = test_data()
 
 # objects initialization
 plotter = Plotter('surface')
-trip = Trip(Pxy, Pz, depot=(-0.0000001, -0.0000001), budget=10)
+depot=(-0.0000001, -0.0000001)
+trip = Trip(depot, Pxy, Pz, budget=10)
 
-var = 999999
+minvar = 999999
 while True:
     while trip.isfeasible():
         trip.add_maxvar_simulatedprobe()  # add point with highest variance
-    if trip.isfeasible(): tour = trip.gettour()  # store last succesful solution (a tour departing from depot)
+        if trip.isfeasible():
+            tour = trip.gettour()  # store last succesful solution (a tour departing from depot)
 
-    plotter.path([depot] + trip.future_xys, tour)  # plot path or surface
-    # plotter.surface(f5, 30)
-    # plotter.surface(lambda x, y: g.predict([(x, y)])[0], 50, 0, 50)
-    # plotter.surface(lambda x, y: g.predict([(x, y)], return_std=True)[1][0], 30, 0.16, 0.18)
+            plotter.path([depot] + trip.future_xys, tour)  # plot path or surface
+            # plotter.surface(f5, 30)
+            # plotter.surface(lambda x, y: g.predict([(x, y)])[0], 50, 0, 50)
+            # plotter.surface(lambda x, y: g.predict([(x, y)], return_std=True)[1][0], 30, 0.16, 0.18)
 
+            var = trip.gettotal_var(TSxy)
+            ast = ''
+            if var < minvar:
+                minvar = var
+                ast = '*'
+
+            print((type(trip.getmodel().kernel).__name__[:12]).expandtabs(13), '\ttour length=\t', len(tour), '\tvar=\t' + fmt(var) + ast) # + '\tcost=\t' + fmt(cost))
+            # show_path([([depot] + Nxy)[i] for i in tour], '\tvar=\t' + fmt(var) + '\terr=\t' + fmt(err) + '\tcost=\t' + fmt(cost))
+        else:
+            # drop last added, unfeasible, point
+            trip.droplast()
+
+    while not trip.isfeasible():
+        print('distort')
+        trip.distort(random_distortion)
+
+    # update pseudoprobings for the new positions
+    trip.resimulate_probing()
+    # TODO: this should be done automatically on demand
+
+    # evaluate fitness
     var = trip.gettotal_var(TSxy)
-    ast = ''
-    if var < minvar:
-        minvar = var
-        ast = '*'
-
-    print((type(g.kernel).__name__[:12]).expandtabs(13), '\ttour length=\t', len(tour_), '\tvar=\t' + fmt(var) + ast + '\terr=\t' + fmt(err) + '\tcost=\t' + fmt(cost))
-    # show_path([([depot] + Nxy)[i] for i in tour], '\tvar=\t' + fmt(var) + '\terr=\t' + fmt(err) + '\tcost=\t' + fmt(cost))
-else:
-    # drop last added, unfeasible, point
-    trip.droplast()
-
-while not trip.isfeasible():
-    trip.distort(random_distortion)
-
-# update pseudoprobings for the new positions
-trip.resimulate_probing()
-# TODO: this should be done automatically on demand
-
-# evaluate fitness
-var = trip.gettotal_var(TSxy)
-print(var)
+    print('var ', var)
 
 # eliminate a point at random to allow the insertion of a new one
 # idx = random.randrange(len(Nxy))

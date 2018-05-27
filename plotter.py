@@ -1,4 +1,7 @@
 import matplotlib.pyplot as plt
+from aux import *
+
+
 class Plotter:
     """Handles plotting
 
@@ -10,7 +13,7 @@ class Plotter:
         self.fig = plt.figure(num=name)
 
     def path(self, points, tour):
-        plot_path(self.plt, self.fig, points, tour)
+        plot_path(plt, self.fig, points, tour)
 
     def surface(self, points, tour):
         raise NotImplementedError

@@ -10,7 +10,7 @@ from tsp import solve_tsp, sequence  # exact
 from tsp import multistart_localsearch  # heuristic
 import time
 
-exact = True
+exact = not True
 n = 10
 SEED = 142
 
@@ -117,6 +117,9 @@ def plan_tour(xys, budget):
                 sol = sequence(range(n), edges)
             else:
                 print('NOT trying exact solution')
+    elif n == 1:
+        cost = 0
+        sol = [0]
     else:
         cost = dist(*pos[0], *pos[1])
         cost = complete_cost(cost, n)

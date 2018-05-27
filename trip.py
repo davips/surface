@@ -10,43 +10,44 @@ class Trip:
     first_zs -- list of measurements in previous trips
     """
 
-    def __init__(self, first_xys, first_zs, depot, budget):
+    def __init__(self, depot, first_xys, first_zs, budget):
         self.depot = depot
         self.budget = budget
         self.first_xys, self.first_zs = first_xys, first_zs
         self.future_xys, self.future_zs = [], []
-        self.iscache_updated_for_model = False
-        self.iscache_updated_for_tour = False
+        self.ismodel_cached = False
+        self.istour_cached = False
+        self.feasible = False
         # self.iscache_updated_for_zs = False
 
     def refit(self, new_xys, new_zs):
         """Update all points of the future trip."""
         self.future_xys, self.future_zs = new_xys, new_zs
         self.model = kernel_selection(self.first_xys + new_xys, self.first_zs + new_zs)
-        self.iscache_updated_for_tour = False
-        self.iscache_updated_for_model = True
+        self.istour_cached = False
+        self.ismodel_cached = True
 
     def getmodel(self):
-        if not self.iscache_updated_for_model: self.refit([], [])
+        if not self.ismodel_cached: self.refit(self.future_xys, self.future_zs)
         return self.model
 
     def add_maxvar_simulatedprobe(self):
         hxy, hz, hstd = max_var(self.getmodel())
         # if dynamic: hz = f5(hx, hy)
         # print(fmt(hx), '\t', fmt(hy), '\t', fmt(hz), '\t', hstd, '\tcurrent max variance point')
-        self.future_xys, self.future_zs = self.future_xys + hxy, self.future_zs + hz
-        self.iscache_updated_for_tour = False
-        self.iscache_updated_for_model = False
+        self.future_xys, self.future_zs = self.future_xys + [hxy], self.future_zs + [hz]
+        self.istour_cached = False
+        self.ismodel_cached = False
 
     def calculate_tour(self):
-        if not self.iscache_updated_for_tour:
+        if not self.istour_cached:
             tour, self.feasible, cost = plan_tour([self.depot] + self.future_xys, self.budget)
             self.tour = tour if self.feasible else []
             self.cost = cost if self.feasible else -1
-            self.iscache_updated_for_tour = True
+            self.istour_cached = True
 
     def resimulate_probing(self):
-        self.future_zs = self.getmodel().predict(self.future_xys, return_std=False)
+        self.future_zs = list(self.getmodel().predict(self.future_xys, return_std=False))
 
     def isfeasible(self):
         self.calculate_tour()
@@ -57,7 +58,7 @@ class Trip:
         return self.tour
 
     def gettotal_var(self, xys):
-        evalu_var(self.getmodel(), xys)
+        return evalu_var(self.getmodel(), xys)
 
     def droplast(self):
         self.future_xys.pop()
@@ -78,8 +79,8 @@ class Trip:
         for ida, idb, idc in zip(tour, tour[1:], tour[2:]):
             (a, b), (c, d), (e, f) = points[ida], points[idb], points[idc]
             self.future_xys[idb - 1] = distortion_function(a, b, c, d, e, f)
-        self.iscache_updated_for_model = False
-        self.iscache_updated_for_tour = False
+        self.ismodel_cached = False
+        self.istour_cached = False
 
 
 def no_distortion(a, b, c, d, e, f):
