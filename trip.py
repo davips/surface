@@ -1,4 +1,5 @@
 from aux import *
+from numpy.random import normal
 
 
 class Trip:
@@ -10,7 +11,11 @@ class Trip:
     first_zs -- list of measurements in previous trips
     """
 
-    def __init__(self, depot, first_xys, first_zs, budget):
+    def __init__(self, depot, first_xys, first_zs, testsetxy, budget, debug=False):
+        self.debug = debug
+        self.testsetxy = testsetxy
+        self.smallest_var = 9999999
+        self.log("init")
         self.depot = depot
         self.budget = budget
         self.first_xys, self.first_zs = first_xys, first_zs
@@ -18,10 +23,16 @@ class Trip:
         self.ismodel_cached = False
         self.istour_cached = False
         self.feasible = False
+        self.cost = 0
+        self.tour = []
         # self.iscache_updated_for_zs = False
+
+    def log(self, str):
+        if self.debug: print('Trip: ', str, '.')
 
     def refit(self, new_xys, new_zs):
         """Update all points of the future trip."""
+        self.log('refit')
         self.future_xys, self.future_zs = new_xys, new_zs
         self.model = kernel_selection(self.first_xys + new_xys, self.first_zs + new_zs)
         self.istour_cached = False
@@ -32,6 +43,7 @@ class Trip:
         return self.model
 
     def add_maxvar_simulatedprobe(self):
+        self.log('add max var')
         hxy, hz, hstd = max_var(self.getmodel())
         # if dynamic: hz = f5(hx, hy)
         # print(fmt(hx), '\t', fmt(hy), '\t', fmt(hz), '\t', hstd, '\tcurrent max variance point')
@@ -40,13 +52,17 @@ class Trip:
         self.ismodel_cached = False
 
     def calculate_tour(self):
+        self.log('calc tour')
         if not self.istour_cached:
+            self.previous_tour = self.tour
+            self.log('   tour not cached')
             tour, self.feasible, cost = plan_tour([self.depot] + self.future_xys, self.budget)
             self.tour = tour if self.feasible else []
             self.cost = cost if self.feasible else -1
             self.istour_cached = True
 
-    def resimulate_probing(self):
+    def resimulate_probings(self):
+        self.log('resimulate')
         self.future_zs = list(self.getmodel().predict(self.future_xys, return_std=False))
 
     def isfeasible(self):
@@ -57,12 +73,22 @@ class Trip:
         self.calculate_tour()
         return self.tour
 
-    def gettotal_var(self, xys):
-        return evalu_var(self.getmodel(), xys)
+    def getvar(self):
+        return self.getvar_on(self.testsetxy)
 
-    def droplast(self):
+    def getvar_on(self, xys):
+        """Only this method (and indirectly issmallest_var()) update smallest_var."""
+        self.log('get tot var')
+        var = evalu_var(self.getmodel(), xys)
+        if var < self.smallest_var: self.smallest_var = var
+        return var
+
+    def undo_last_simulatedprobe(self):
+        self.log('undo last probe')
         self.future_xys.pop()
         self.future_zs.pop()
+        self.tour = self.previous_tour
+        self.ismodel_cached = False
 
     def push(self):
         """Stores current set of (future) points. The set goes to a stack and can be restored later with pop()."""
@@ -74,6 +100,7 @@ class Trip:
     def distort(self, distortion_function):
         """Apply a custom distortion function to all points."""
         # $%&$%%#"add depot to the beginning to allow triangulation (and to correct indexes to match tour indexes)
+        self.log('distort')
         tour = self.tour
         points = [self.depot] + self.future_xys
         for ida, idb, idc in zip(tour, tour[1:], tour[2:]):
@@ -81,6 +108,10 @@ class Trip:
             self.future_xys[idb - 1] = distortion_function(a, b, c, d, e, f)
         self.ismodel_cached = False
         self.istour_cached = False
+
+    def issmallest_var(self):
+        var = self.getvar()
+        return var <= self.smallest_var
 
 
 def no_distortion(a, b, c, d, e, f):
