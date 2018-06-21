@@ -10,7 +10,7 @@ from tsp import solve_tsp, sequence  # exact
 from tsp import multistart_localsearch  # heuristic
 import time
 
-exact = not True
+exact = True
 n = 10
 SEED = 142
 
@@ -83,6 +83,7 @@ def max_var(g):
     stdmax, zmax, xymax = max(zip(stds, zs, xys))
     return xymax, zmax, stdmax
 
+
 def rnd(g):
     xs = np.arange(0.0, 1.01, 1. / n)
     ys = np.arange(0.0, 1.01, 1. / n)
@@ -125,7 +126,7 @@ def plan_tour(xys, budget):
                 sol = sequence(range(n), edges)
             else:
                 pass
-                # print('NOT trying exact solution')
+                print('NOT trying exact solution')
     elif n == 1:
         cost = 0
         sol = [0]

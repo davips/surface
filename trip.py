@@ -30,11 +30,11 @@ class Trip:
     def log(self, str):
         if self.debug: print('Trip: ', str, '.')
 
-    def refit(self, new_xys, new_zs):
+    def refit(self, future_xys, future_zs):
         """Update all points of the future trip."""
         self.log('refit')
-        self.future_xys, self.future_zs = new_xys, new_zs
-        self.model = kernel_selection(self.first_xys + new_xys, self.first_zs + new_zs)
+        self.future_xys, self.future_zs = future_xys, future_zs
+        self.model = kernel_selection(self.first_xys + future_xys, self.first_zs + future_zs)
         self.istour_cached = False
         self.ismodel_cached = True
 
@@ -86,23 +86,26 @@ class Trip:
         if var < self.smallest_var: self.smallest_var = var
         return var
 
-    def undo_last_simulatedprobe(self):
+    def undo_last_simulatedprobing(self):
         self.log('undo last probe')
         self.future_xys.pop()
         self.future_zs.pop()
         self.tour = self.previous_tour
         self.ismodel_cached = False
+        self.istour_cached = False
 
-    def push(self):
-        """Stores current set of (future) points. The set goes to a stack and can be restored later with pop()."""
-        raise NotImplementedError
+    def store(self):
+        """Store current list of (future) points. The list can be restored later with restore()."""
+        self.stored_future_xys = self.future_xys.copy()
 
-    def pop(self):
-        raise NotImplementedError
+    def restore(self):
+        self.future_xys = self.stored_future_xys.copy()
+        self.ismodel_cached = False
+        self.istour_cached = False
+        self.resimulate_probings()
 
     def distort(self, distortion_function):
-        """Apply a custom distortion function to all points."""
-        # $%&$%%#"add depot to the beginning to allow triangulation (and to correct indexes to match tour indexes)
+        """Apply a custom distortion function to all points, except depot and last. Call resimulate_probings() should be called after that."""
         self.log('distort')
         tour = self.tour
         points = [self.depot] + self.future_xys
@@ -115,6 +118,18 @@ class Trip:
     def issmallest_var(self):
         var = self.getvar()
         return var <= self.smallest_var
+
+# eliminate a point at random to allow the insertion of a new one
+# idx = random.randrange(len(Nxy))
+# Nxy.pop(idx)
+# Nz.pop(idx)
+# tour.remove(idx)
+#
+# def fu(i):
+#     return i if i < idx else i - 1
+#
+#
+# tour = list(map(fu, tour))
 
 
 def no_distortion(a, b, c, d, e, f):
