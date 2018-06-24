@@ -6,7 +6,7 @@ import time
 
 at_random = argv[1] == 'rnd'
 if at_random: print("Random mode!")
-(Pxy, Pz), (TSxy, TSz) = train_data(), test_data()  # generate list P with points from previous probing and testing data
+(Pxy, Pz), (TSxy, _) = train_data(), test_data()  # generate list P with points from previous probing and testing data
 depot, attempts, feasible = (-0.0000001, -0.0000001), 10, True
 trip = Trip(depot, Pxy, Pz, TSxy, budget=30, debug=not True)
 plotter = Plotter('surface')

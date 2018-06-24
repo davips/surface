@@ -9,8 +9,9 @@ from functions import f5, f10
 from tsp import solve_tsp, sequence  # exact
 from tsp import multistart_localsearch  # heuristic
 import time
+import itertools
 
-exact = True
+exact = not True
 n = 10
 SEED = 142
 
@@ -203,3 +204,13 @@ def plot_path(plt, fig, points, tour):
     fig.canvas.flush_events()  # update the plot and take care of window events (like resizing etc.)
     time.sleep(0.5)
     pl.remove()
+
+
+def flat(l):
+    return list(itertools.chain(*l))
+
+
+def tuplefy(x):
+    it = iter(x)
+    x2 = list(zip(it, it))
+    return [tuple(l) for l in x2]

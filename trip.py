@@ -31,12 +31,19 @@ class Trip:
         if self.debug: print('Trip: ', str, '.')
 
     def refit(self, future_xys, future_zs):
-        """Update all points of the future trip."""
+        """Update all points of the future trip, with provided probings."""
         self.log('refit')
         self.future_xys, self.future_zs = future_xys, future_zs
         self.model = kernel_selection(self.first_xys + future_xys, self.first_zs + future_zs)
         self.istour_cached = False
         self.ismodel_cached = True
+
+    def refit2(self, future_xys):
+        """Update all points of the future trip, with simulated probings."""
+        self.log('refit2')
+        self.future_xys = future_xys
+        self.resimulate_probings()
+        self.refit(future_xys, self.future_zs)
 
     def getmodel(self):
         if not self.ismodel_cached: self.refit(self.future_xys, self.future_zs)
