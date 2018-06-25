@@ -5,8 +5,10 @@ from sys import argv
 import time
 
 at_random = argv[1] == 'rnd'
+err = argv[2] == 'err'
 if at_random: print("Random mode!")
-(Pxy, Pz), (TSxy, _) = train_data(), test_data()  # generate list P with points from previous probing and testing data
+print("Printing error") if err else print("Printing 'total' variance")
+(Pxy, Pz), (TSxy, TSz) = train_data(), test_data()  # generate list P with points from previous probing and testing data
 depot, attempts, feasible = (-0.0000001, -0.0000001), 10, True
 trip = Trip(depot, Pxy, Pz, TSxy, budget=30, debug=not True)
 plotter = Plotter('surface')
@@ -16,7 +18,11 @@ while True:
     while feasible:
         plotter.path([depot] + trip.future_xys, trip.gettour())  # plot path or surface
         ast = '\t*' if trip.issmallest_var() else ''
-        print(fmt(trip.getvar()) + ast)  # print((type(trip.getmodel().kernel).__name__[:12]).expandtabs(13), '\ttour length=\t', len(tour), '\tvar=\t' + fmt(trip.getvar()) + ast)  # + '\tcost=\t' + fmt(cost))
+        if err:
+            trip2 = Trip(depot, Pxy + trip.future_xys, Pz + probe(trip.future_xys), TSxy, budget=30, debug=not True)
+            print(fmt(trip2.geterr_on(TSxy, TSz)) + '\t' + 'err')
+        else:
+            print(fmt(trip.getvar()) + ast)  # print((type(trip.getmodel().kernel).__name__[:12]).expandtabs(13), '\ttour length=\t', len(tour), '\tvar=\t' + fmt(trip.getvar()) + ast)  # + '\tcost=\t' + fmt(cost))
         trip.add_rnd_simulatedprobe() if at_random else trip.add_maxvar_simulatedprobe()
         feasible = trip.isfeasible()
         if not feasible: trip.undo_last_simulatedprobing()

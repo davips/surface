@@ -25,6 +25,7 @@ class Trip:
         self.feasible = False
         self.cost = 0
         self.tour = []
+        self.previous_var = 3.1415123234
         # self.iscache_updated_for_zs = False
 
     def log(self, str):
@@ -93,6 +94,11 @@ class Trip:
         if var < self.smallest_var: self.smallest_var = var
         return var
 
+    def geterr_on(self, xys, zs):
+        self.log('get err')
+        err = evalu_sum(self.getmodel(), xys, zs)
+        return err
+
     def undo_last_simulatedprobing(self):
         self.log('undo last probe')
         self.future_xys.pop()
@@ -124,7 +130,9 @@ class Trip:
 
     def issmallest_var(self):
         var = self.getvar()
-        return var <= self.smallest_var
+        res = var <= self.smallest_var and var != self.previous_var
+        self.previous_var = var
+        return res
 
 # eliminate a point at random to allow the insertion of a new one
 # idx = random.randrange(len(Nxy))

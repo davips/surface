@@ -160,6 +160,10 @@ def evalu_var(g, xys):
     return sum(stds)
 
 
+def probe(xys):
+    return [f5(x, y) for x, y in xys]
+
+
 def fmt(txt):
     return "{:6.6f}".format(txt)
 
