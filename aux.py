@@ -11,7 +11,6 @@ from tsp import multistart_localsearch  # heuristic
 import time
 import itertools
 
-exact = not True
 n = 10
 SEED = 142
 
@@ -103,7 +102,7 @@ def complete_cost(cost, n):
     return cost + n
 
 
-def plan_tour(xys, budget):
+def plan_tour(xys, budget, exact):
     n = len(xys)
     pos = xys
     c = {}

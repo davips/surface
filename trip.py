@@ -11,7 +11,8 @@ class Trip:
     first_zs -- list of measurements in previous trips
     """
 
-    def __init__(self, depot, first_xys, first_zs, testsetxy, budget, debug=False):
+    def __init__(self, exact, depot, first_xys, first_zs, testsetxy, budget, debug=False):
+        self.exact = exact
         self.debug = debug
         self.testsetxy = testsetxy
         self.smallest_var = 9999999
@@ -67,7 +68,7 @@ class Trip:
         if not self.istour_cached:
             self.previous_tour = self.tour
             self.log('   tour not cached')
-            tour, self.feasible, cost = plan_tour([self.depot] + self.future_xys, self.budget)
+            tour, self.feasible, cost = plan_tour([self.depot] + self.future_xys, self.budget, self.exact)
             self.tour = tour if self.feasible else []
             self.cost = cost if self.feasible else -1
             self.istour_cached = True
