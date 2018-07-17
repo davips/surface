@@ -70,7 +70,7 @@ class Trip:
             self.log('   tour not cached')
             tour, self.feasible, cost = plan_tour([self.depot] + self.future_xys, self.budget, self.exact)
             self.tour = tour if self.feasible else []
-            self.cost = cost if self.feasible else -1
+            self.cost = cost #if self.feasible else -1
             self.istour_cached = True
 
     def resimulate_probings(self):
@@ -156,7 +156,7 @@ def median_distortion(a, b, c, d, e, f):
     """Distortion towards median line = shortening the path."""
     m, n = (a + e) / 2, (b + f) / 2
     # offset = 0.1 * (dist(a, b, c, d) + dist(c, d, e, f) - dist(a, b, e, f))
-    p = 0.01
+    p = 0.05
     return c + p * (m - c), d + p * (n - d)
 
 

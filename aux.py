@@ -5,7 +5,6 @@ import math
 import random
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D  # Esse import evita "ValueError: Unknown projection '3d'"
-from functions import f5, f10
 from tsp import solve_tsp, sequence  # exact
 from tsp import multistart_localsearch  # heuristic
 import time
@@ -45,12 +44,12 @@ def kernel_selection(xys, zs):
     return gpr
 
 
-def train_data(seed=SEED):
-    return data(f5, math.ceil(n / 3), seed + 1)
+def train_data(f,seed=SEED):
+    return data(f, math.ceil(n / 3), seed + 1)
 
 
-def test_data(seed=SEED):
-    return data(f5, n, seed + 2)
+def test_data(f,seed=SEED):
+    return data(f, n, seed + 2)
 
 
 def data(f, n2, seed=SEED):
@@ -159,8 +158,8 @@ def evalu_var(g, xys):
     return sum(stds)
 
 
-def probe(xys):
-    return [f5(x, y) for x, y in xys]
+def probe(f, xys):
+    return [f(x, y) for x, y in xys]
 
 
 def fmt(txt):

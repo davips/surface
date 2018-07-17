@@ -6,11 +6,16 @@ import time
 from math import sqrt
 from args import *
 from swarm import *
+from functions import *
 
-at_random, full_log, swarm, distortionf, search_type = parse_args(argv)
-(Pxy, Pz), (TSxy, TSz) = train_data(), test_data()  # generate list P with points from previous probing and testing data
-depot, attempts, feasible = (-0.0000001, -0.0000001), 10, True
-trip = Trip(search_type, depot, Pxy, Pz, TSxy, budget=30, debug=full_log)
+
+
+f=f10
+
+at_random, full_log, swarm, distortionf, exact_search = parse_args(argv)
+(Pxy, Pz), (TSxy, TSz) = train_data(f), test_data(f)  # generate list P with points from previous probing and testing data
+depot, attempts, feasible = (-0.0000001, -0.0000001), 5, True
+trip = Trip(exact_search, depot, Pxy, Pz, TSxy, budget=30, debug=full_log)
 plotter = Plotter('surface')
 
 while True:
@@ -19,7 +24,7 @@ while True:
         plotter.path([depot] + trip.future_xys, trip.gettour())  # plot path or surface
         ast = '\t*' if trip.issmallest_var() else ''
         if full_log:
-            trip2 = Trip(depot, Pxy + trip.future_xys, Pz + probe(trip.future_xys), TSxy, budget=30, debug=not True)
+            trip2 = Trip(exact_search, depot, Pxy + trip.future_xys, Pz + probe(f, trip.future_xys), TSxy, budget=30, debug=not True)
             print(fmt(trip.getvar()) + ast, fmt(trip2.geterr_on(TSxy, TSz)) + '\t' + 'err\tlength=\t', len(trip.future_xys), (type(trip.getmodel().kernel).__name__[:12]).expandtabs(13))
         else:
             print(fmt(trip.getvar()))
