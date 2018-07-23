@@ -1,3 +1,15 @@
+#     This program is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU Lesser General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU Lesser General Public License for more details.
+#
+#     You should have received a copy of the GNU Lesser General Public License
+#     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from trip import *
 from time import *
 
@@ -5,8 +17,10 @@ from time import *
 def parse_args(argv):
     opts = {'distortion': ({'random': random_distortion, 'pswarm': no_distortion, 'shrink': median_distortion}, 'type of distortion to apply to the points'),
             'first-points': ({'chance': True, 'maxvar': False}, 'select inicial probing points by chance or according to max variance'),
-            'log': ({'mini': False, 'full': True}, 'controls amount of log output: just the variance values or maximal'),
-            'search': ({'exact': True, 'heuri': False}, 'type of TSP search: exaustive or heuristic')}
+            'log': ({'mini': False, 'full': True}, 'controls amount of output: just the variance values or more values'),
+            'verbosity': ({'less': False, 'more': True}, 'controls logging from Trip: whether to show internals information or not'),
+            'search': ({'exact': True, 'heuri': False}, 'type of TSP search: exaustive or heuristic'),
+            'nfirst-points': ({'4x4': 4, '7x7': 7, '10x10': 10}, 'amount of inicial probing points')}
     try:
         args = list(map(lambda x: tuple(x.split('=')), argv[1:]))
         dic = dict(args)
@@ -14,7 +28,7 @@ def parse_args(argv):
         # Check arguments.
         for arg, val in args:
             if val not in opts[arg][0].keys():
-                raise Exception('Value ' + val + ' not in [' + '|'.join(opts[arg][0].keys()), '].')
+                raise Exception('Value ' + val + ' not in [' + '|'.join(opts[arg][0].keys()) + '].')
 
         r = {}
         for k in opts.keys():
@@ -35,4 +49,4 @@ def parse_args(argv):
         raise
     else:
         print(dic)
-    return r['first-points'], r['log'], r['distortion'] == no_distortion, r['distortion'], r['search']
+    return r['nfirst-points'], r['first-points'], r['log'], r['distortion'] == no_distortion, r['distortion'], r['search'], r['verbosity']

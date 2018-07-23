@@ -1,3 +1,15 @@
+#     This program is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU Lesser General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU Lesser General Public License for more details.
+#
+#     You should have received a copy of the GNU Lesser General Public License
+#     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from sklearn.gaussian_process.kernels import WhiteKernel, RationalQuadratic, RBF, Matern, ExpSineSquared
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.model_selection import cross_val_score
@@ -44,12 +56,23 @@ def kernel_selection(xys, zs):
     return gpr
 
 
-def train_data(f,seed=SEED):
-    return data(f, math.ceil(n / 3), seed + 1)
+def train_data(l,f,seed=SEED):
+    return data(f, l, seed + 1)
 
 
 def test_data(f,seed=SEED):
-    return data(f, n, seed + 2)
+    mesh, zs = [], []
+    for i in range(101):
+        for j in range(101):
+            x, y = i / 100., j / 100.
+            mesh.append((x, y))
+            zs.append(f(x, y))
+    # z = estimator(X, z, mesh)
+    # final = 0
+    # for i in range(len(mesh)):
+    #     (x, y) = mesh[i]
+    #     final += abs(f(x, y) - float(z[i]))
+    return mesh, zs
 
 
 def data(f, n2, seed=SEED):
