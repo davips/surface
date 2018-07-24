@@ -16,11 +16,11 @@ from time import *
 
 def parse_args(argv):
     opts = {'distortion': ({'random': random_distortion, 'pswarm': no_distortion, 'shrink': median_distortion}, 'type of distortion to apply to the points'),
-            'first-points': ({'chance': True, 'maxvar': False}, 'select inicial probing points by chance or according to max variance'),
+            'next-points': ({'chance': True, 'maxvar': False}, 'select next probing points by chance or according to max variance'),
             'log': ({'mini': False, 'full': True}, 'controls amount of output: just the variance values or more values'),
             'verbosity': ({'less': False, 'more': True}, 'controls logging from Trip: whether to show internals information or not'),
             'search': ({'exact': True, 'heuri': False}, 'type of TSP search: exaustive or heuristic'),
-            'nfirst-points': ({'4x4': 4, '7x7': 7, '10x10': 10}, 'amount of inicial probing points')}
+            'known-points': ({'4x4': 4, '7x7': 7, '10x10': 10}, 'amount of inicial probing points')}
     try:
         args = list(map(lambda x: tuple(x.split('=')), argv[1:]))
         dic = dict(args)
@@ -49,4 +49,4 @@ def parse_args(argv):
         raise
     else:
         print(dic)
-    return r['nfirst-points'], r['first-points'], r['log'], r['distortion'] == no_distortion, r['distortion'], r['search'], r['verbosity']
+    return r['known-points'], r['next-points'], r['log'], r['distortion'] == no_distortion, r['distortion'], r['search'], r['verbosity']

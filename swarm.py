@@ -30,11 +30,11 @@ def swarm_distortion(trip):
             # trip.restore()
             trip.refit2(tuplefy(x))
             v = trip.getvar()
-            return v if trip.isfeasible() else v + 10 * (trip.cost - trip.budget)
+            return v # if trip.isfeasible() else v + 10 * (trip.cost - trip.budget)
 
         return [var(x) for x in xs]
 
-    # trip.restore()
+    # trip.restore() # não lembro porque coloquei essa linha aqui, me parece errado então retirei.
     x0 = flat(trip.future_xys)
     variabs = len(x0)
     problem = {'Variables': variabs, 'objf': py_objf, 'lb': zeros(variabs), 'ub': ones(variabs), 'x0': x0}
