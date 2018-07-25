@@ -31,11 +31,11 @@ while True:
         if show == 'var': plotter.surface(lambda x, y: trip.getmodel().predict([(x, y)], return_std=True)[1][0], 30, 0, 1)
         if show == 'path': plotter.path([depot] + trip.future_xys, trip.gettour())
         if show == 'fun': plotter.surface(lambda x, y: f(x, y), 30, 0, 50)
-        if show == 'est':
+        if show == 'est':  # estimated function after performing all probings
             trip2 = Trip(exact_search, depot, Pxy + trip.future_xys, Pz + probe(f, trip.future_xys), TSxy, budget, debug=not True)
             plotter.surface(lambda x, y: trip2.getmodel().predict([(x, y)])[0], 30, 0, 50)
         ast = '\t*\t' if trip.issmallest_var() else '\t.\t'
-        if full_log:
+        if full_log:  # calculate error after all probings and rechoosing kernel
             trip2 = Trip(exact_search, depot, Pxy + trip.future_xys, Pz + probe(f, trip.future_xys), TSxy, budget, debug=not True)
             print(fmt(trip.getvar()) + ast, fmt(trip2.geterr_on(TSxy, TSz)) + '\t' + 'err\tlength=\t', len(trip.future_xys) , '\t' , (type(trip.getmodel().kernel).__name__[:12]).expandtabs(13))
         else:
