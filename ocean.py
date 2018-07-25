@@ -37,7 +37,7 @@ while True:
         ast = '\t*\t' if trip.issmallest_var() else '\t.\t'
         if full_log:
             trip2 = Trip(exact_search, depot, Pxy + trip.future_xys, Pz + probe(f, trip.future_xys), TSxy, budget, debug=not True)
-            print(fmt(trip.getvar()) + ast, fmt(trip2.geterr_on(TSxy, TSz)) + '\t' + 'err\tlength=\t', len(trip.future_xys), (type(trip.getmodel().kernel).__name__[:12]).expandtabs(13))
+            print(fmt(trip.getvar()) + ast, fmt(trip2.geterr_on(TSxy, TSz)) + '\t' + 'err\tlength=\t', len(trip.future_xys) , '\t' , (type(trip.getmodel().kernel).__name__[:12]).expandtabs(13))
         else:
             print(fmt(trip.getvar()))
         trip.add_rnd_simulatedprobe() if at_random else trip.add_maxvar_simulatedprobe()
@@ -55,7 +55,3 @@ while True:
 
     # update pseudoprobings for the new positions
     trip.resimulate_probings() if feasible and trip.getvar() <= minvar else trip.restore()
-
-# # whether it is dynamic (or static)
-# dynamic = argv[1] == 'dyn'
-# if dynamic: print("Dynamic mode!")
