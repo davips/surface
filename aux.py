@@ -26,7 +26,7 @@ n = 10
 SEED = 142
 
 
-def kernel_selection(xys, zs):
+def kernel_selector(xys, zs):
     # define limits of the hyperparameter space
     # bounds = [(0.00001, 0.0001), (0.0001, 0.001), (0.001, 0.01), (0.01, 0.1), (0.1, 1), (1, 10), (10, 100), (100, 1000), (1000, 10000), (10000, 100000)]
     # nu_bounds = [0.1, 0.5, 1, 1.5, 2, 2.5, 5, 20]
@@ -50,11 +50,7 @@ def kernel_selection(xys, zs):
         if err < min_error:
             min_error = err
             min_error_kernel = kernel
-
-    # fit using all training data and best kernel
-    gpr = GaussianProcessRegressor(kernel=min_error_kernel, n_restarts_optimizer=5, copy_X_train=True)
-    gpr.fit(xys, zs)
-    return gpr
+    return min_error_kernel
 
 
 def train_data(l,f,seed=SEED):

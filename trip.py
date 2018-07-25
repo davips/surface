@@ -39,7 +39,12 @@ class Trip:
         self.cost = 0
         self.tour = []
         self.previous_var = 3.1415123234
-        # self.iscache_updated_for_zs = False
+        self.kernel = kernel_selector(self.first_xys, self.first_zs)
+        self.fit()
+
+    def fit(self):
+        self.model = GaussianProcessRegressor(kernel=self.kernel, n_restarts_optimizer=5, copy_X_train=True)
+        self.model.fit(self.first_xys + self.future_xys, self.first_zs + self.future_zs)
 
     def log(self, str):
         if self.debug: print('Trip: ', str, '.')
@@ -48,7 +53,7 @@ class Trip:
         """Update all points of the future trip, with provided probings."""
         self.log('refit')
         self.future_xys, self.future_zs = future_xys, future_zs
-        self.model = kernel_selection(self.first_xys + future_xys, self.first_zs + future_zs)
+        self.fit()
         self.istour_cached = False
         self.ismodel_cached = True
 
