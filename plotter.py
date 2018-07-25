@@ -27,6 +27,5 @@ class Plotter:
     def path(self, points, tour):
         plot_path(plt, self.fig, points, tour)
 
-    def surface(self, points, tour):
-        raise NotImplementedError
-    #     plot_path(self.plt, self.fig, points, tour)
+    def surface(self, f, n, zmin, zmax, filename=None):
+        p(plt, self.fig, f, n, zmin, zmax, filename)

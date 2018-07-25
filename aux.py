@@ -37,13 +37,14 @@ def kernel_selection(xys, zs):
     quads = [RationalQuadratic(length_scale_bounds=(a, b), alpha_bounds=(c, d)) for a, b in bounds for c, d in bounds]
     rbfs = [RBF(length_scale_bounds=(a, b)) for a, b in bounds]
     mtns = [Matern(length_scale_bounds=(a, b), nu=c) for a, b in bounds for c in nu_bounds]
+    # ExpSineSquared(),
+    # kernels = [RationalQuadratic(length_scale_bounds=(0.08, 100)) + WhiteKernel(noise_level_bounds=(1e-5, 1e-2))]
     kernels = quads + rbfs + mtns
-    # ExpSineSquared(),    # kernel = RationalQuadratic(length_scale_bounds=(0.08, 100)) + WhiteKernel(noise_level_bounds=(1e-5, 1e-2))
 
     # find best kernel on k-fold CV
     min_error = 99999
-    for kernel in kernels[:1]:
-        gpr = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=5, copy_X_train=True)
+    for kernel in kernels:
+        gpr = GaussianProcessRegressor(kernel=kernel + WhiteKernel(noise_level_bounds=(1e-5, 1e-2)), n_restarts_optimizer=5, copy_X_train=True)
         err = -1 * cross_val_score(gpr, xys, zs, scoring='neg_mean_absolute_error', cv=5).mean()
         # print((type(kernel).__name__[:12] + '\t:\t' + str(err)).expandtabs(13))
         if err < min_error:

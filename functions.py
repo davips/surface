@@ -99,38 +99,38 @@ def _f(x, y, p):
 
 
 # treino
-def ff0(x, y): return 0
+def f0(x, y): return 0
 
 
-def ff1(x, y): return _f(x, y, [1])
+def f1(x, y): return _f(x, y, [1])
 
 
-def ff2(x, y): return _f(x, y, [1, 2])
+def f2(x, y): return _f(x, y, [1, 2])
 
 
-def ff3(x, y): return _f(x, y, [1, 2, 3])
+def f3(x, y): return _f(x, y, [1, 2, 3])
 
 
-def ff4(x, y): return _f(x, y, [1, 2, 3, 4])
+def f4(x, y): return _f(x, y, [1, 2, 3, 4])
 
 
-def ff5(x, y): return _f(x, y, [1, 2, 3, 4, 5])
+def f5(x, y): return _f(x, y, [1, 2, 3, 4, 5])
 
 
 # teste (??)
-def ff6(x, y): return _f(x, y, [6])
+def f6(x, y): return _f(x, y, [6])
 
 
-def ff7(x, y): return _f(x, y, [6, 7])
+def f7(x, y): return _f(x, y, [6, 7])
 
 
-def ff8(x, y): return _f(x, y, [6, 7, 8])
+def f8(x, y): return _f(x, y, [6, 7, 8])
 
 
-def ff9(x, y): return _f(x, y, [6, 7, 8, 9])
+def f9(x, y): return _f(x, y, [6, 7, 8, 9])
 
 
-def ff10(x, y): return _f(x, y, [6, 7, 8, 9, 10])
+def f10(x, y): return _f(x, y, [6, 7, 8, 9, 10])
 
 
 def plot(f, n, filename=None):

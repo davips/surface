@@ -12,15 +12,18 @@
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from trip import *
 from time import *
+from functions import *
 
 
 def parse_args(argv):
     opts = {'distortion': ({'random': random_distortion, 'pswarm': no_distortion, 'shrink': median_distortion}, 'type of distortion to apply to the points'),
-            'next-points': ({'chance': True, 'maxvar': False}, 'select next probing points by chance or according to max variance'),
+            'next': ({'chance': True, 'maxvar': False}, 'select next probing points by chance or according to max variance'),
             'log': ({'mini': False, 'full': True}, 'controls amount of output: just the variance values or more values'),
+            'plot': ({'path': 'path', 'var': 'var', 'est' :'est', 'fun': 'fun', 'none':'none'}, 'whether to plot path, variance, estimated/true function or nothing'),
             'verbosity': ({'less': False, 'more': True}, 'controls logging from Trip: whether to show internals information or not'),
             'search': ({'exact': True, 'heuri': False}, 'type of TSP search: exaustive or heuristic'),
-            'known-points': ({'4x4': 4, '7x7': 7, '10x10': 10}, 'amount of inicial probing points')}
+            'known': ({'4x4': 4, '7x7': 7, '10x10': 10}, 'amount of inicial probing points'),
+            'f': ({'1': f1, '2': f2, '3': f3, '4': f4, '5': f5, '6': f6, '7': f7, '8': f8, '9': f9, '10': f10}, 'true function')}
     try:
         args = list(map(lambda x: tuple(x.split('=')), argv[1:]))
         dic = dict(args)
@@ -49,4 +52,4 @@ def parse_args(argv):
         raise
     else:
         print(dic)
-    return r['known-points'], r['next-points'], r['log'], r['distortion'] == no_distortion, r['distortion'], r['search'], r['verbosity']
+    return r['plot'], r['f'], r['known'], r['next'], r['log'], r['distortion'] == no_distortion, r['distortion'], r['search'], r['verbosity']
