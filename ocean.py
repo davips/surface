@@ -39,7 +39,7 @@ while True:
             trip2 = Trip(exact_search, depot, Pxy + trip.future_xys, Pz + probe(f, trip.future_xys), TSxy, budget, debug=not True)
             print(fmt(trip.getvar()) + ast, fmt(trip2.geterr_on(TSxy, TSz)) + '\t' + 'err\tlength=\t', len(trip.future_xys) , '\t' , (type(trip.getmodel().kernel).__name__[:12]).expandtabs(13))
         else:
-            print(fmt(trip.getvar()))
+            print(fmt(trip.getvar()) + '\tvar')
         trip.add_rnd_simulatedprobe() if at_random else trip.add_maxvar_simulatedprobe()
         feasible = trip.isfeasible()
         if not feasible: trip.undo_last_simulatedprobing()
