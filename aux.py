@@ -53,11 +53,11 @@ def kernel_selector(xys, zs):
     return min_error_kernel
 
 
-def train_data(l,f,seed=SEED):
+def train_data(l, f, seed=SEED):
     return data(f, l, seed + 1)
 
 
-def test_data(f,seed=SEED):
+def test_data(f, seed=SEED):
     mesh, zs = [], []
     for i in range(101):
         for j in range(101):
@@ -236,3 +236,7 @@ def tuplefy(x):
     it = iter(x)
     x2 = list(zip(it, it))
     return [tuple(l) for l in x2]
+
+
+def log(str):
+    print('out:\t' + str)

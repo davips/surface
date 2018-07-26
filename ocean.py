@@ -21,7 +21,7 @@ from swarm import *
 
 show, f, side, at_random, full_log, swarm, distortionf, exact_search, verbose = parse_args(argv)
 (Pxy, Pz), (TSxy, TSz) = train_data(side, f), test_data(f)  # generate list P with points from previous probing and testing data
-depot, attempts, feasible, budget = (-0.0000001, -0.0000001), 5, True, 100
+depot, attempts, feasible, budget = (-0.0000001, -0.0000001), 100, True, 100
 trip = Trip(exact_search, depot, Pxy, Pz, TSxy, budget, debug=verbose)
 if show != 'none': plotter = Plotter('surface')
 
@@ -37,21 +37,38 @@ while True:
         ast = '\t*\t' if trip.issmallest_var() else '\t.\t'
         if full_log:  # calculate error after all probings and rechoosing kernel
             trip2 = Trip(exact_search, depot, Pxy + trip.future_xys, Pz + probe(f, trip.future_xys), TSxy, budget, debug=not True)
-            print(fmt(trip.getvar()) + ast, fmt(trip2.geterr_on(TSxy, TSz)) + '\t' + 'err\tlength=\t', len(trip.future_xys) , '\t' , (type(trip.getmodel().kernel).__name__[:12]).expandtabs(13))
+            print('out:\t' + fmt(trip.getvar()) + ast, fmt(trip2.geterr_on(TSxy, TSz)) + '\t' + 'err\tlength=\t', len(trip.future_xys) , '\t' , (type(trip.getmodel().kernel).__name__[:12]).expandtabs(13))
         else:
-            print(fmt(trip.getvar()) + '\tvar')
+            print('out:\t' + fmt(trip.getvar()) + '\tvar')
         trip.add_rnd_simulatedprobe() if at_random else trip.add_maxvar_simulatedprobe()
         feasible = trip.isfeasible()
         if not feasible: trip.undo_last_simulatedprobing()
 
+    # calculate error before distortion
+    # trip2 = Trip(exact_search, depot, Pxy + trip.future_xys, Pz + probe(f, trip.future_xys), TSxy, budget, debug=not True)
+    # log(fmt(trip.getvar()) + ast + fmt(trip2.geterr_on(TSxy, TSz)) + '\t' + 'err before distort\tlength=\t' + str(len(trip.future_xys)) + '\t' + (type(trip.getmodel().kernel).__name__[:12]).expandtabs(13))
+
     # Find feasible distortion.
     minvar = trip.getvar()
     trip.store()
-    c = 0
-    while not feasible and c < attempts:
-        swarm_distortion(trip) if swarm else trip.distort(distortionf)
-        feasible = trip.isfeasible()
-        c += 1
-
-    # update pseudoprobings for the new positions
-    trip.resimulate_probings() if feasible and trip.getvar() <= minvar else trip.restore()
+    if swarm:
+        while not feasible:
+            trip.restore()
+            swarm_distortion(trip)
+            feasible = trip.isfeasible()
+            trip.resimulate_probings()
+            log(fmt(trip.getvar()) + '\tswarm var; feasible:\t' + str(feasible))
+    else:
+        c = 0
+        min_var = 9999999
+        while c < attempts:
+            trip.distort(distortionf)
+            feasible = trip.isfeasible()
+            trip.resimulate_probings()
+            var = trip.getvar()
+            log(fmt(var) + '\tdistortion var; feasible:\t' + str(feasible))
+            if var < min_var:
+                min_var = var
+                trip.store()
+            c += 1
+        trip.restore()
