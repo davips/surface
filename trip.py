@@ -23,14 +23,13 @@ class Trip:
     first_zs -- list of measurements in previous trips
     """
 
-    def __init__(self, exact, depot, first_xys, first_zs, testsetxy, budget, debug=False):
+    def __init__(self, exact, depot, first_xys, first_zs, testsetxy, debug=False):
         self.exact = exact
-        self.debug = debug
         self.testsetxy = testsetxy
         self.smallest_var = 9999999
+        self.debug = debug
         self.log("init")
         self.depot = depot
-        self.budget = budget
         self.first_xys, self.first_zs = first_xys, first_zs
         self.future_xys, self.future_zs = [], []
         self.ismodel_cached = False
@@ -80,12 +79,13 @@ class Trip:
     def add_rnd_simulatedprobe(self):
         self.add(*rnd(self.getmodel()), 'rnd')
 
-    def calculate_tour(self):
+    def calculate_tour(self, budget):
+        self.last_budget = budget
         self.log('calc tour')
         if not self.istour_cached:
             self.previous_tour = self.tour
             self.log('   tour not cached')
-            tour, self.feasible, cost = plan_tour([self.depot] + self.future_xys, self.budget, self.exact)
+            tour, self.feasible, cost = plan_tour([self.depot] + self.future_xys, budget, self.exact)
             self.tour = tour if self.feasible else []
             self.cost = cost #if self.feasible else -1
             self.istour_cached = True
@@ -94,13 +94,20 @@ class Trip:
         self.log('resimulate')
         self.future_zs = list(self.getmodel().predict(self.future_xys, return_std=False))
 
-    def isfeasible(self):
-        self.calculate_tour()
+    def isfeasible(self, budget):
+        self.last_budget = budget
+        self.calculate_tour(budget)
         return self.feasible
 
-    def gettour(self):
-        self.calculate_tour()
+    def gettour(self, budget):
+        self.last_budget = budget
+        self.calculate_tour(budget)
         return self.tour
+
+    def getcost(self, budget):
+        self.last_budget = budget
+        self.calculate_tour(budget)
+        return self.cost
 
     def getvar(self):
         return self.getvar_on(self.testsetxy)
