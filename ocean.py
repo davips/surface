@@ -21,12 +21,13 @@ from swarm import *
 
 show, f, side, at_random, full_log, swarm, distortionf, exact_search, verbose = parse_args(argv)
 (Pxy, Pz), (TSxy, TSz) = train_data(side, f), test_data(f)  # generate list P with points from previous probing and testing data
-depot, attempts, feasible = (-0.0000001, -0.0000001), 200, True
+depot, attempts = (-0.0000001, -0.0000001), 200
 trip = Trip(exact_search, depot, Pxy, Pz, TSxy, debug=verbose)
 if show != 'none': plotter = Plotter('surface')
 
 for budget in range(10, 200, 5):
     # Add maximum amount of feasible points for the given budget.
+    feasible = True
     while feasible:
         trip.add_rnd_simulatedprobe() if at_random else trip.add_maxvar_simulatedprobe()
         feasible = trip.isfeasible(budget)
@@ -49,12 +50,13 @@ for budget in range(10, 200, 5):
         while c < attempts:
             trip.distort(distortionf)
             feasible = trip.isfeasible(budget)
-            trip.resimulate_probings()
-            var = trip.getvar()
-            # log(fmt(var) + '\tdistortion var; feasible:\t' + str(feasible))
-            if var < min_var:
-                min_var = var
-                trip.store()
+            if feasible:
+                trip.resimulate_probings()
+                var = trip.getvar()
+                # log(fmt(var) + '\tdistortion var; feasible:\t' + str(feasible))
+                if var < min_var:
+                    min_var = var
+                    trip.store()
             c += 1
         trip.restore()
 
