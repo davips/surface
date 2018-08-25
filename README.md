@@ -10,7 +10,7 @@ Copy gurobi folder (gurobi752 ?) to the current folder, if exact search is neede
 
 # usage examples
 ```
-python -u ocean.py
+python -u ocean.py               # shows usage
 python -u ocean.py known=4x4 next=maxvar distortion=random search=heuri log=mini verbosity=less plot=fun f=2
 python -u ocean.py known=4x4 next=maxvar distortion=random search=heuri log=mini verbosity=less plot=path f=2
 python -u ocean.py known=4x4 next=maxvar distortion=pswarm search=heuri log=full verbosity=less plot=none f=2 2> /dev/null | grep out
