@@ -154,11 +154,6 @@ def plan_tour(xys, budget, exact):
         cost = complete_cost(cost, n)
         sol = [0, 1]
 
-    # if cost <= budget:
-    #     print('>>>>>>>>>>>>>>>>> Feasible= total cost\t', fmt(cost), '\tis less than\t', fmt(budget))
-    # else:
-    #     print("Unfeasible.")
-
     return sol, cost <= budget, cost
 
 

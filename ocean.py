@@ -60,7 +60,7 @@ for budget in range(10, 200, 5):
             c += 1
         trip.restore()
 
-    if trip.getcost(budget) > budget: log("cost > budget!")
+    if trip.getcost(budget) > budget: log(fmt(trip.getcost(budget)) + "cost > budget!" + fmt(budget))
 
     # Plotting.
     if show == 'var': plotter.surface(lambda x, y: trip.getmodel().predict([(x, y)], return_std=True)[1][0], 30, 0, 1)
@@ -73,6 +73,6 @@ for budget in range(10, 200, 5):
     # Logging.
     if full_log:  # calculate error after all probings and rechoosing kernel
         trip2 = Trip(exact_search, depot, Pxy + trip.future_xys, Pz + probe(f, trip.future_xys), TSxy, debug=not True)
-        print('out:\t' + fmt(trip.getvar()), fmt(trip2.geterr_on(TSxy, TSz)) + '\t' + 'err\tlength=\t', len(trip.future_xys) , '\t' , (type(trip.getmodel().kernel).__name__[:12]).expandtabs(13))
+        print('out:\t' + fmt(trip.getvar()), fmt(trip2.geterr_on(TSxy, TSz)) + '\t' + 'err\tlength=\t', len(trip.future_xys), '\t', (type(trip.getmodel().kernel).__name__[:12]).expandtabs(13))
     else:
         print('out:\t' + fmt(trip.getvar()) + '\tvar')
