@@ -44,7 +44,7 @@ for budget in range(10, 200, 5):
             trip.resimulate_probings()
             # log(fmt(trip.getvar()) + '\tswarm var; feasible:\t' + str(feasible))
     else:
-        c = 0
+        c = attempts - 1 if distortionf == median_distortion else c = 0
         min_var = trip.getvar()
         trip.store()
         while c < attempts:

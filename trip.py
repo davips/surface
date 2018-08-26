@@ -180,7 +180,7 @@ def median_distortion(a, b, c, d, e, f):
     """Distortion towards median line = shortening the path."""
     m, n = (a + e) / 2, (b + f) / 2
     # offset = 0.1 * (dist(a, b, c, d) + dist(c, d, e, f) - dist(a, b, e, f))
-    p = 0.05
+    p = 0.1
     return c + p * (m - c), d + p * (n - d)
 
 
