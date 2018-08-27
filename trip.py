@@ -176,6 +176,10 @@ def no_distortion(a, b, c, d, e, f):
     return c, d
 
 
+def ps_distortion(a, b, c, d, e, f):
+    pass
+
+
 def median_distortion(a, b, c, d, e, f):
     """Distortion towards median line = shortening the path."""
     m, n = (a + e) / 2, (b + f) / 2

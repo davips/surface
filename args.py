@@ -18,7 +18,7 @@ from functions import *
 def parse_args(argv):
     opts = {'known': ({'4x4': 4, '7x7': 7, '10x10': 10}, 'amount of inicial probing points'),
             'next': ({'chance': True, 'maxvar': False}, 'select next probing points by chance or according to max variance'),
-            'distortion': ({'random': random_distortion, 'pswarm': no_distortion, 'shrink': median_distortion}, 'type of distortion to apply to the points'),
+            'distortion': ({'random': random_distortion, 'none': no_distortion, 'pswarm': ps_distortion, 'shrink': median_distortion}, 'type of distortion to apply to the points'),
             'search': ({'exact': True, 'heuri': False}, 'type of TSP search: exaustive or heuristic'),
             'log': ({'mini': False, 'full': True}, 'controls amount of output: just the variance values or more values'),
             'verbosity': ({'less': False, 'more': True}, 'controls logging from Trip: whether to show internals information or not'),
@@ -52,4 +52,4 @@ def parse_args(argv):
         raise
     else:
         print(dic)
-    return r['plot'], r['f'], r['known'], r['next'], r['log'], r['distortion'] == no_distortion, r['distortion'], r['search'], r['verbosity']
+    return r['plot'], r['f'], r['known'], r['next'], r['log'], r['distortion'] == ps_distortion, r['distortion'], r['search'], r['verbosity']

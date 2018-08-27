@@ -44,7 +44,8 @@ for budget in range(10, 200, 5):
             trip.resimulate_probings()
             # log(fmt(trip.getvar()) + '\tswarm var; feasible:\t' + str(feasible))
     else:
-        c = attempts - 1 if distortionf == median_distortion else c = 0
+        c = 0
+        if distortionf == no_distortion or distortionf == median_distortion: c = attempts - 1
         min_var = trip.getvar()
         trip.store()
         while c < attempts:
@@ -60,7 +61,7 @@ for budget in range(10, 200, 5):
             c += 1
         trip.restore()
 
-    if trip.getcost(budget) > budget: log(fmt(trip.getcost(budget)) + "cost > budget!" + fmt(budget))
+    if trip.getcost(budget) > budget: print(fmt(trip.getcost(budget)) + "cost > budget!" + fmt(budget))
 
     # Plotting.
     if show == 'var': plotter.surface(lambda x, y: trip.getmodel().predict([(x, y)], return_std=True)[1][0], 30, 0, 1)
