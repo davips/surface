@@ -27,14 +27,12 @@ def swarm_distortion(trip):
 
     def py_objf(xs):
         def var(x):
-            # trip.restore()
             trip.refit2(tuplefy(x))
             v = trip.getvar()
-            return v if trip.isfeasible(trip.last_budget) else v + 10 * (trip.cost - trip.last_budget)
+            return v + 10 * (trip.cost - trip.last_budget) if trip.penalize() else v
 
         return [var(x) for x in xs]
 
-    # trip.restore() # não lembro porque coloquei essa linha aqui, me parece errado então retirei.
     x0 = flat(trip.future_xys)
     variabs = len(x0)
     problem = {'Variables': variabs, 'objf': py_objf, 'lb': zeros(variabs), 'ub': ones(variabs), 'x0': x0}
@@ -44,5 +42,4 @@ def swarm_distortion(trip):
         , 'outputfcn': py_outf, 'vectorized': 1}
     result = pswarm(problem, options)
     if result['ret'] == 0:  # zero means successful
-        # trip.restore()
         trip.refit2(tuplefy(result['x']))

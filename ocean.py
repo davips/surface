@@ -19,10 +19,10 @@ from math import sqrt
 from args import *
 from swarm import *
 
-show, f, side, at_random, full_log, swarm, distortionf, exact_search, verbose = parse_args(argv)
+show, f, side, at_random, full_log, swarm, distortionf, exact_search, penalize, verbose = parse_args(argv)
 (Pxy, Pz), (TSxy, TSz) = train_data(side, f), test_data(f)  # generate list P with points from previous probing and testing data
 depot, attempts = (-0.0000001, -0.0000001), 200
-trip = Trip(exact_search, depot, Pxy, Pz, TSxy, debug=verbose)
+trip = Trip(exact_search, depot, Pxy, Pz, TSxy, penalize, debug=verbose)
 if show != 'none': plotter = Plotter('surface')
 
 for budget in range(10, 200, 5):
@@ -68,12 +68,12 @@ for budget in range(10, 200, 5):
     if show == 'path': plotter.path([depot] + trip.future_xys, trip.gettour(budget))
     if show == 'fun': plotter.surface(lambda x, y: f(x, y), 30, 0, 50)
     if show == 'est':  # estimated function after performing all probings
-        trip2 = Trip(exact_search, depot, Pxy + trip.future_xys, Pz + probe(f, trip.future_xys), TSxy, debug=not True)
+        trip2 = Trip(exact_search, depot, Pxy + trip.future_xys, Pz + probe(f, trip.future_xys), TSxy, penalize, debug=not True)
         plotter.surface(lambda x, y: trip2.getmodel().predict([(x, y)])[0], 30, 0, 50)
 
     # Logging.
     if full_log:  # calculate error after all probings and rechoosing kernel
-        trip2 = Trip(exact_search, depot, Pxy + trip.future_xys, Pz + probe(f, trip.future_xys), TSxy, debug=not True)
+        trip2 = Trip(exact_search, depot, Pxy + trip.future_xys, Pz + probe(f, trip.future_xys), TSxy, penalize, debug=not True)
         print('out:\t' + fmt(trip.getvar()), fmt(trip2.geterr_on(TSxy, TSz)) + '\t' + 'err\tlength=\t', len(trip.future_xys), '\t', (type(trip.getmodel().kernel).__name__[:12]).expandtabs(13))
     else:
         print('out:\t' + fmt(trip.getvar()) + '\tvar')

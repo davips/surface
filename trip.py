@@ -23,8 +23,9 @@ class Trip:
     first_zs -- list of measurements in previous trips
     """
 
-    def __init__(self, exact, depot, first_xys, first_zs, testsetxy, debug=False):
+    def __init__(self, exact, depot, first_xys, first_zs, testsetxy, penal, debug=False):
         self.exact = exact
+        self.should_penalize = penal
         self.testsetxy = testsetxy
         self.smallest_var = 9999999
         self.debug = debug
@@ -158,6 +159,9 @@ class Trip:
         res = var <= self.smallest_var and var != self.previous_var
         self.previous_var = var
         return res
+
+    def penalize(self):
+        return self.should_penalize and not self.isfeasible(self.last_budget)
 
 # eliminate a point at random to allow the insertion of a new one
 # idx = random.randrange(len(Nxy))

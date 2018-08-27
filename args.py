@@ -21,6 +21,7 @@ def parse_args(argv):
             'distortion': ({'random': random_distortion, 'none': no_distortion, 'pswarm': ps_distortion, 'shrink': median_distortion}, 'type of distortion to apply to the points'),
             'search': ({'exact': True, 'heuri': False}, 'type of TSP search: exaustive or heuristic'),
             'log': ({'mini': False, 'full': True}, 'controls amount of output: just the variance values or more values'),
+            'penal': ({'y': True, 'n': False}, 'whether or not pswarm should penalize unfeasible paths'),
             'verbosity': ({'less': False, 'more': True}, 'controls logging from Trip: whether to show internals information or not'),
             'plot': ({'path': 'path', 'var': 'var', 'est' :'est', 'fun': 'fun', 'none':'none'}, 'whether to plot path, variance, estimated/true function or nothing'),
             'f': ({'1': f1, '2': f2, '3': f3, '4': f4, '5': f5, '6': f6, '7': f7, '8': f8, '9': f9, '10': f10}, 'true function')}
@@ -52,4 +53,4 @@ def parse_args(argv):
         raise
     else:
         print(dic)
-    return r['plot'], r['f'], r['known'], r['next'], r['log'], r['distortion'] == ps_distortion, r['distortion'], r['search'], r['verbosity']
+    return r['plot'], r['f'], r['known'], r['next'], r['log'], r['distortion'] == ps_distortion, r['distortion'], r['search'], r['penal'], r['verbosity']
