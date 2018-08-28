@@ -21,7 +21,7 @@ from swarm import *
 
 show, f, side, at_random, full_log, swarm, distortionf, exact_search, penalize, verbose = parse_args(argv)
 (Pxy, Pz), (TSxy, TSz) = train_data(side, f), test_data(f)  # generate list P with points from previous probing and testing data
-depot, attempts = (-0.0000001, -0.0000001), 200
+depot, attempts = (-0.0000001, -0.0000001), 4000
 trip = Trip(exact_search, depot, Pxy, Pz, TSxy, penalize, debug=verbose)
 if show != 'none': plotter = Plotter('surface')
 

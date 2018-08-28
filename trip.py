@@ -41,6 +41,7 @@ class Trip:
         self.previous_var = 3.1415123234
         self.kernel = kernel_selector(self.first_xys, self.first_zs)
         self.fit()
+        self.c = 0
 
     def fit(self):
         self.model = GaussianProcessRegressor(kernel=self.kernel, n_restarts_optimizer=5, copy_X_train=True)
@@ -88,7 +89,7 @@ class Trip:
             self.log('   tour not cached')
             tour, self.feasible, cost = plan_tour([self.depot] + self.future_xys, budget, self.exact)
             self.tour = tour if self.feasible else []
-            self.cost = cost #if self.feasible else -1
+            self.cost = cost  # if self.feasible else -1
             self.istour_cached = True
 
     def resimulate_probings(self):
@@ -109,6 +110,13 @@ class Trip:
         self.last_budget = budget
         self.calculate_tour(budget)
         return self.cost
+
+    def reset(self):
+        self.c = 0
+
+    def count(self):
+        self.c = self.c + 1
+        print(self.c)
 
     def getvar(self):
         return self.getvar_on(self.testsetxy)
@@ -162,6 +170,7 @@ class Trip:
 
     def penalize(self):
         return self.should_penalize and not self.isfeasible(self.last_budget)
+
 
 # eliminate a point at random to allow the insertion of a new one
 # idx = random.randrange(len(Nxy))
