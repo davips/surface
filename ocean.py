@@ -41,6 +41,7 @@ for budget in range(10, 200, 5):
             trip.restore()
             swarm_distortion(trip)
             feasible = trip.isfeasible(budget)
+            if not feasible: log("swarm not feasible!")
             trip.resimulate_probings()
             # log(fmt(trip.getvar()) + '\tswarm var; feasible:\t' + str(feasible))
     else:
