@@ -145,8 +145,18 @@ class Trip:
         """Store current list of (future) points. The list can be restored later with restore()."""
         self.stored_future_xys = self.future_xys.copy()
 
+    def store2(self):
+        """Store current list of (future) points. The list can be restored later with restore2()."""
+        self.stored_future_xys2 = self.future_xys.copy()
+
     def restore(self):
         self.future_xys = self.stored_future_xys.copy()
+        self.ismodel_cached = False
+        self.istour_cached = False
+        self.resimulate_probings()
+
+    def restore2(self):
+        self.future_xys = self.stored_future_xys2.copy()
         self.ismodel_cached = False
         self.istour_cached = False
         self.resimulate_probings()

@@ -21,11 +21,10 @@ from swarm import *
 
 show, f, side, at_random, full_log, swarm, distortionf, exact_search, penalize, verbose = parse_args(argv)
 (Pxy, Pz), (TSxy, TSz) = train_data(side, f), test_data(f)  # generate list P with points from previous probing and testing data
-depot, attempts = (-0.0000001, -0.0000001), 4000
+depot, attempts = (-0.0000001, -0.0000001), 3000
 trip = Trip(exact_search, depot, Pxy, Pz, TSxy, penalize, debug=verbose)
 if show != 'none': plotter = Plotter('surface')
-
-for budget in range(10, 200, 5):
+for budget in range(10, 300, 10):
     # Add maximum amount of feasible points for the given budget.
     feasible = True
     while feasible:
@@ -36,14 +35,11 @@ for budget in range(10, 200, 5):
     # Find feasible distortion.
     minvar = trip.getvar()
     trip.store()
+    trip.store2()
     if swarm:
-        while not feasible:
-            trip.restore()
-            swarm_distortion(trip)
-            feasible = trip.isfeasible(budget)
-            if not feasible: log("swarm not feasible!")
-            trip.resimulate_probings()
-            # log(fmt(trip.getvar()) + '\tswarm var; feasible:\t' + str(feasible))
+        swarm_distortion(trip)
+        feasible = trip.isfeasible(budget)
+        trip.resimulate_probings()
     else:
         c = 0
         if distortionf == no_distortion or distortionf == median_distortion: c = attempts - 1
@@ -55,14 +51,16 @@ for budget in range(10, 200, 5):
             if feasible:
                 trip.resimulate_probings()
                 var = trip.getvar()
-                # log(fmt(var) + '\tdistortion var; feasible:\t' + str(feasible))
                 if var < min_var:
                     min_var = var
                     trip.store()
             c += 1
         trip.restore()
 
-    if trip.getcost(budget) > budget: print(fmt(trip.getcost(budget)) + "cost > budget!" + fmt(budget))
+    # Allows some flexibility here, meaning that the budget is actually a bit bigger.
+    if trip.getcost(budget) > budget + 0.5:
+        print(fmt(trip.getcost(budget)) + "cost > budget!" + fmt(budget))
+        trip.restore2()
 
     # Plotting.
     if show == 'var': plotter.surface(lambda x, y: trip.getmodel().predict([(x, y)], return_std=True)[1][0], 30, 0, 1)

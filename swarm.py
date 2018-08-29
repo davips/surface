@@ -36,7 +36,7 @@ def swarm_distortion(trip):
     variabs = len(x0)
     problem = {'Variables': variabs, 'objf': py_objf, 'lb': zeros(variabs), 'ub': ones(variabs), 'x0': x0}
     # , 'A': [[-1.0 / sqrt(3), 1], [-1.0, sqrt(3)], [1.0, sqrt(3)]], 'b': [0, 0, 6]
-    options = {'maxf': 4000, 'maxit': 4000, 'social': 0.5, 'cognitial': 0.5, 'fweight': 0.4
+    options = {'maxf': 3000, 'maxit': 3000, 'social': 0.5, 'cognitial': 0.5, 'fweight': 0.4
         , 'iweight': 0.9, 'size': 200, 'iprint': 10, 'tol': 1E-5, 'ddelta': 0.5, 'idelta': 2.0
         , 'outputfcn': py_outf, 'vectorized': 1}
     result = pswarm(problem, options)
