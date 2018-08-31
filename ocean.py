@@ -19,7 +19,7 @@ from math import sqrt
 from args import *
 from swarm import *
 
-show, f, side, at_random, full_log, swarm, distortionf, exact_search, penalize, verbose = parse_args(argv)
+show, f, side, at_random, full_log, swarm, ga, distortionf, exact_search, penalize, verbose = parse_args(argv)
 (Pxy, Pz), (TSxy, TSz) = train_data(side, f), test_data(f)  # generate list P with points from previous probing and testing data
 depot, attempts = (-0.0000001, -0.0000001), 3000
 trip = Trip(exact_search, depot, Pxy, Pz, TSxy, penalize, debug=verbose)
@@ -38,8 +38,8 @@ for budget in range(10, 300, 10):
     trip.store2()
     if swarm:
         swarm_distortion(trip)
-        feasible = trip.isfeasible(budget)
-        trip.resimulate_probings()
+    elif ga:
+        ga_distortion(trip)
     else:
         c = 0
         if distortionf == no_distortion or distortionf == median_distortion: c = attempts - 1
@@ -56,6 +56,8 @@ for budget in range(10, 300, 10):
                     trip.store()
             c += 1
         trip.restore()
+    feasible = trip.isfeasible(budget)
+    trip.resimulate_probings()
 
     # Allows some flexibility here, meaning that the budget is actually a bit bigger.
     if trip.getcost(budget) > budget + 0.5:
@@ -75,4 +77,4 @@ for budget in range(10, 300, 10):
         trip2 = Trip(exact_search, depot, Pxy + trip.future_xys, Pz + probe(f, trip.future_xys), TSxy, penalize, debug=not True)
         print('out:\t' + fmt(trip.getvar()) + '\t' + fmt(trip2.geterr_on(TSxy, TSz)) + '\t' + 'err\tlength=\t', len(trip.future_xys), '\t', (type(trip2.getmodel().kernel).__name__[:12]).expandtabs(13))
     else:
-        print('out:\t' + fmt(trip.getvar()) + '\tvar')
+        print('out:\t' + fmt(trip.getvar()) + '\tvar\tlength=\t', len(trip.future_xys))
