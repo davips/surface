@@ -79,7 +79,7 @@ def ga_distortion(trip):
     vmin = 999999
     for i in range(0, popsize):
         trip.refit2(probings[i])
-        v = trip.getvar() + (10 * (trip.cost - trip.last_budget) if trip.penalize() else 0)
+        v = trip.getvar() + (10 * (trip.cost - trip.last_budget) if trip.penalize() else 0)  # penalize() updates cost
         if v < vmin:
             best = i
             vmin = v

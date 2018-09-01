@@ -61,7 +61,7 @@ for budget in range(10, 300, 10):
 
     # Allows some flexibility here, meaning that the budget is actually a bit bigger.
     if trip.getcost(budget) > budget + 0.5:
-        print(fmt(trip.getcost(budget)) + "cost > budget!" + fmt(budget))
+        log(fmt(trip.getcost(budget)) + "cost > budget!" + fmt(budget))
         trip.restore2()
 
     # Plotting.
