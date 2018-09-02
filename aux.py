@@ -23,7 +23,7 @@ import time
 import itertools
 from numpy.random import normal, uniform
 
-n = 10
+ngrid = 100
 SEED = 142
 
 
