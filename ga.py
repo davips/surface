@@ -18,7 +18,8 @@ from aux import *
 from trip import *
 from numpy.random import normal, uniform
 
-popsize, select, iters = 100, 10, 30
+popsize = 64
+select, iters = round(math.sqrt(popsize)), round(3000 / popsize)
 
 
 def select_fittest(distr):
@@ -61,9 +62,9 @@ def ga_distortion(trip):
         distr = []
         for i in range(0, popsize):
             fit[i] /= sumfit
-        for i in range(0, popsize):
+        for i in range(1, popsize):
             distr.append(sum(fit[:i]))
-        print(distr)
+        distr.append(1)
 
         # Select the fittest ones.
         selected = set()

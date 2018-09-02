@@ -21,6 +21,7 @@ from tsp import solve_tsp, sequence  # exact
 from tsp import multistart_localsearch  # heuristic
 import time
 import itertools
+from numpy.random import normal, uniform
 
 n = 10
 SEED = 142
@@ -95,21 +96,19 @@ def gp(xys, zs):
 
 
 def max_var(g):
-    xs = np.arange(0.0, 1.01, 1. / n)
-    ys = np.arange(0.0, 1.01, 1. / n)
-    xys = [(xs[i], ys[j]) for i in range(n + 1) for j in range(n + 1)]
+    xs = np.arange(0.0, 1.01, 1. / ngrid)
+    ys = np.arange(0.0, 1.01, 1. / ngrid)
+    xys = [(xs[i], ys[j]) for i in range(ngrid + 1) for j in range(ngrid + 1)]
     zs, stds = g.predict(xys, return_std=True)
     stdmax, zmax, xymax = max(zip(stds, zs, xys))
     return xymax, zmax, stdmax
 
 
 def rnd(g):
-    xs = np.arange(0.0, 1.01, 1. / n)
-    ys = np.arange(0.0, 1.01, 1. / n)
-    xys = [(xs[i], ys[j]) for i in range(n + 1) for j in range(n + 1)]
+    xys = [(uniform(), uniform())]
     zs, stds = g.predict(xys, return_std=True)
-    stdmax, zmax, xymax = random.choice(list(zip(stds, zs, xys)))
-    return xymax, zmax, stdmax
+    std, z, xy = stds[0], zs[0], xys[0]
+    return xy, z, std
 
 
 def dist(x1, y1, x2, y2):
