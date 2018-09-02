@@ -29,7 +29,7 @@ def swarm_distortion(trip):
         def var(x):
             trip.refit2(tuplefy(x))
             v = trip.getvar()
-            return v + 10 * (trip.cost - trip.last_budget) if trip.penalize() else v  # penalize() updates cost
+            return v + 10 * (trip.cost - trip.last_budget) if trip.penalize() else v  # penalize() might update cost
 
         return [var(x) for x in xs]
 
