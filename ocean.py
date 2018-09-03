@@ -24,7 +24,7 @@ show, f, side, at_random, full_log, swarm, ga, distortionf, exact_search, penali
 depot, attempts = (-0.0000001, -0.0000001), 3000
 trip = Trip(exact_search, depot, Pxy, Pz, TSxy, penalize, debug=verbose)
 if show != 'none': plotter = Plotter('surface')
-for budget in range(10, 300, 10):
+for budget in range(10, 200, 20):
     # Add maximum amount of feasible points for the given budget.
     feasible = True
     while feasible:
@@ -76,6 +76,6 @@ for budget in range(10, 300, 10):
     # Logging.
     if full_log:  # calculate error after all probings and rechoosing kernel
         trip2 = Trip(exact_search, depot, Pxy + trip.future_xys, Pz + probe(f, trip.future_xys), TSxy, penalize, debug=not True)
-        print('out:\t' + fmt(trip.getvar()) + '\t' + fmt(trip2.geterr_on(TSxy, TSz)) + '\t' + 'err\tlength=\t', len(trip.future_xys), '\t', (type(trip2.getmodel().kernel).__name__[:12]).expandtabs(13))
+        print('out:\t' + fmt(trip.getcost(budget)) + '\t' + fmt(trip.getvar()) + '\t' + fmt(trip2.geterr_on(TSxy, TSz)) + '\t' + 'err\tlength=\t', len(trip.future_xys), '\t', (type(trip2.getmodel().kernel).__name__[:12]).expandtabs(13))
     else:
-        print('out:\t' + fmt(trip.getvar()) + '\tvar\tlength=\t', len(trip.future_xys))
+        print('out:\t' + fmt(trip.getcost(budget)) + '\t' + fmt(trip.getvar()) + '\tvar\tlength=\t', len(trip.future_xys))
