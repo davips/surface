@@ -115,7 +115,11 @@ class Trip:
         self.c = 0
 
     def count(self):
-        self.c = self.c + 1
+        tmp = self.c
+        time.sleep(random.uniform(0, 0.01))
+        self.c = tmp + 1
+
+    def print_count(self):
         print(self.c)
 
     def getvar(self):

@@ -27,8 +27,9 @@ def swarm_distortion(trip):
 
     def py_objf(xs):
         def var(x):
-            trip.refit2(tuplefy(x))
+            trip.refit2(tuplefy(x))  # according to my tests with trip.count(), trip methods don't need to be thread-safe here
             v = trip.getvar()
+            # trip.count()
             return v + 10 * (trip.cost - trip.last_budget) if trip.penalize() else v  # penalize() might update cost
 
         return [var(x) for x in xs]

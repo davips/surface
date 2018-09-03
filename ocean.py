@@ -58,6 +58,7 @@ for budget in range(10, 300, 10):
         trip.restore()
     feasible = trip.isfeasible(budget)
     trip.resimulate_probings()
+    # trip.print_count()
 
     # Allows some flexibility here, meaning that the budget is actually a bit bigger.
     if trip.getcost(budget) > budget + 0.5:
