@@ -18,7 +18,7 @@ from aux import *
 from trip import *
 from numpy.random import normal, uniform
 
-popsize = 64
+popsize = 49
 select, iters = round(math.sqrt(popsize)), round(3000 / popsize)
 
 
