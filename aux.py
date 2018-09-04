@@ -234,3 +234,28 @@ def tuplefy(x):
 
 def log(str):
     print('out:\t' + str)
+
+
+def distort(depot, trip_xys, tour, distortion_function):
+    """Apply a custom distortion function to all points, except depot and last."""
+    points = [depot] + trip_xys
+    for ida, idb, idc in zip(tour, tour[1:], tour[2:]):
+        (a, b), (c, d), (e, f) = points[ida], points[idb], points[idc]
+        trip_xys[idb - 1] = distortion_function(a, b, c, d, e, f)
+
+
+def no_distortion(a, b, c, d, e, f):
+    return c, d
+
+
+def median_distortion(a, b, c, d, e, f):
+    """Distortion towards median line = shortening the path."""
+    m, n = (a + e) / 2, (b + f) / 2
+    # offset = 0.1 * (dist(a, b, c, d) + dist(c, d, e, f) - dist(a, b, e, f))
+    p = 0.1
+    return c + p * (m - c), d + p * (n - d)
+
+
+def random_distortion(a, b, c, d, e, f):
+    s = 0.01 * (dist(a, b, c, d) + dist(c, d, e, f)) / 2
+    return c + normal(scale=s), d + normal(scale=s)

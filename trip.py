@@ -199,12 +199,12 @@ class Trip:
 # tour = list(map(fu, tour))
 
 
-def no_distortion(a, b, c, d, e, f):
-    return c, d
-
-
 def ps_distortion(a, b, c, d, e, f):
     pass
+
+
+def no_distortion(a, b, c, d, e, f):
+    return c, d
 
 
 def median_distortion(a, b, c, d, e, f):
