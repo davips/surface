@@ -3,7 +3,7 @@ from numpy.random import normal, uniform
 from functions import *
 
 # Induce model.
-side, budget, na, nb, f = 4, 10, 5, 5, f5
+side, budget, na, nb, f = 4, 20, 100000000, 50, f5
 (first_xys, first_zs), (TSxy, TSz) = train_data(side, f), test_data(f)
 kernel = kernel_selector(first_xys, first_zs)
 model = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=5, copy_X_train=True)
@@ -35,18 +35,11 @@ while a < na:
 
     # Induce model with simulated points.
     trip_zs = model.predict(trip_xys, return_std=False)
-    kernel = kernel_selector(first_xys + trip_xys, first_zs + list(trip_zs))  # TODO recalcular kernel incluindo pontos simulados ou manter kernel inicial?
+    # kernel = kernel_selector(first_xys + trip_xys, first_zs + list(trip_zs))  # TODO recalcular kernel incluindo pontos simulados ou manter kernel inicial?
     model2 = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=5, copy_X_train=True)
     model2.fit(first_xys + trip_xys, first_zs + list(trip_zs))
 
     trip_var = evalu_var(model2, TSxy)
-
-    # Logging.
-    kernel = kernel_selector(first_xys + trip_xys, first_zs + probe(f, trip_xys))
-    model3 = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=5, copy_X_train=True)
-    model3.fit(first_xys + trip_xys, first_zs + probe(f, trip_xys))
-    error = evalu_sum(TSxy, TSz)
-    print(trip_var, error, sep='\t')
 
     if trip_var < trip_var_min:
         trip_var_min = trip_var
@@ -54,6 +47,15 @@ while a < na:
     else:
         trip_xys = new_trip_xys2
 
+    # print(current_milli_time() * 1000)
+    # Logging.
+    kernel = kernel_selector(first_xys + trip_xys, first_zs + probe(f, trip_xys))
+    model3 = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=5, copy_X_train=True)
+    model3.fit(first_xys + trip_xys, first_zs + probe(f, trip_xys))
+    error = evalu_sum(model3, TSxy, TSz)
+    print(trip_var_min, error, sep='\t')
+
+    # print(current_milli_time(), "-----------------------------")
     # Remove city at random.
     random.shuffle(trip_xys)
     trip_xys = trip_xys[:-1]
