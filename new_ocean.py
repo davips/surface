@@ -32,8 +32,9 @@ while a < na:
     b = 0
     while b < nb:
         distort1(depot, trip_xys, tour, random_distortion)
-        trip_var = evalu_var(model, trip_xys)
-        if trip_var > trip_var_max:
+        tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
+        if feasible: trip_var = evalu_var(model, trip_xys)
+        if feasible and trip_var > trip_var_max:
             trip_var_max = trip_var
             new_trip_xys = trip_xys.copy()
         else:
