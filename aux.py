@@ -253,6 +253,16 @@ def distort1(depot, trip_xys, tour, distortion_function):
     trip_xys[idb - 1] = distortion_function(a, b, c, d, e, f)
 
 
+def middle_insertion(depot, trip_xys, tour):
+    """Add new point between two adjacent random points."""
+    points = [depot] + trip_xys
+    ttt = list(zip(tour, tour[1:]))
+    ida, idb = random.choice(ttt)
+    (a, b), (c, d) = points[ida], points[idb]
+    m, n = (a + c) / 2, (b + d) / 2
+    trip_xys.append((m, n))
+
+
 def no_distortion(a, b, c, d, e, f):
     return c, d
 

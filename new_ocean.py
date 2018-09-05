@@ -6,7 +6,7 @@ from random import randint
 from plotter import Plotter
 
 # Induce model.
-side, budget, na, nb, f = 4, 40, 100000000, 100, f5
+side, budget, na, nb, f = 4, 10, 100000000, 100, f5
 (first_xys, first_zs), (TSxy, TSz) = train_data(side, f), test_data(f)
 kernel = RBF(length_scale_bounds=(0.0001, 10000)) #TODO: kernel_selector(first_xys, first_zs)
 model = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=5, copy_X_train=True)
@@ -27,9 +27,19 @@ while True:
     old_tour = tour.copy()
 
 for a in range(0, na):
-
     # Add points between neighboring cities.
-    # while True:
+    old_tour = tour.copy()
+    old_trip_xys = trip_xys.copy()
+    while True:
+        middle_insertion(depot, trip_xys, tour)
+        tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
+
+        if not feasible:
+            trip_xys = old_trip_xys.copy()
+            tour = old_tour.copy()
+            break
+        old_trip_xys = trip_xys.copy()
+        old_tour = tour.copy()
 
     # Distort one city at a time.
     trip_var_max = evalu_var(model, trip_xys)
@@ -41,7 +51,6 @@ for a in range(0, na):
         if feasible and trip_var > trip_var_max:
             trip_var_max = trip_var
             new_trip_xys = trip_xys.copy()
-            if plot: plotter.path([depot] + trip_xys, tour)
         else:
             trip_xys = new_trip_xys.copy()
         b += 1
@@ -62,7 +71,6 @@ for a in range(0, na):
         trip_xys = new_trip_xys2.copy()
 
     # Logging.
-    # print(trip_xys)
     # kernel = kernel_selector(first_xys + trip_xys, first_zs + probe(f, trip_xys)) #TODO descomentar na versão final
     model3 = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=5, copy_X_train=True)
     model3.fit(first_xys + trip_xys, first_zs + probe(f, trip_xys))
@@ -75,11 +83,10 @@ for a in range(0, na):
         plotter.path([depot] + trip_xys, tour)
 
     # Remove city at random.
-    l = len(trip_xys)
-    e = randint(0, l - 1)
+    e = randint(0, len(trip_xys) - 1)
     del trip_xys[e]
     tour.remove(e)
-    for i in range(0, l):
+    for i in range(0, len(tour)):
         if tour[i] > e: tour[i] -= 1
 
 trip_xys = new_trip_xys2.copy()
