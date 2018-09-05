@@ -6,7 +6,7 @@ from random import randint
 from plotter import Plotter
 
 # Induce model.
-side, budget, na, nb, f = 7, 100, 100000000, 3000, f5
+side, budget, na, nb, f = 4, 100, 100000000, 1000, f5
 (first_xys, first_zs), (TSxy, TSz) = train_data(side, f), test_data(f)
 kernel = Matern(length_scale_bounds=(0.000001, 100000), nu=1.6) #TODO kernel_selector(first_xys, first_zs)
 print(type(kernel))
