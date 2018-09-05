@@ -27,7 +27,7 @@ ngrid = 100
 SEED = 142
 
 
-def kernel_selector(xys, zs):
+def kernel_selector(xys, zs, seed=42):
     # define limits of the hyperparameter space
     # bounds = [(0.00001, 0.0001), (0.0001, 0.001), (0.001, 0.01), (0.01, 0.1), (0.1, 1), (1, 10), (10, 100), (100, 1000), (1000, 10000), (10000, 100000)]
     # nu_bounds = [0.1, 0.5, 1, 1.5, 2, 2.5, 5, 20]
@@ -45,7 +45,7 @@ def kernel_selector(xys, zs):
     # find best kernel on k-fold CV
     min_error = 99999
     for kernel in kernels:
-        gpr = GaussianProcessRegressor(kernel=kernel + WhiteKernel(noise_level_bounds=(1e-5, 1e-2)), n_restarts_optimizer=5, copy_X_train=True)
+        gpr = GaussianProcessRegressor(kernel=kernel + WhiteKernel(noise_level_bounds=(1e-5, 1e-2)), n_restarts_optimizer=25, copy_X_train=True, random_state=seed)
         err = -1 * cross_val_score(gpr, xys, zs, scoring='neg_mean_absolute_error', cv=5).mean()
         # print((type(kernel).__name__[:12] + '\t:\t' + str(err)).expandtabs(13))
         if err < min_error:
