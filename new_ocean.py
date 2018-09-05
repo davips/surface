@@ -31,7 +31,7 @@ while a < na:
     new_trip_xys = trip_xys.copy()
     b = 0
     while b < nb:
-        distort(depot, trip_xys, tour, random_distortion)
+        distort1(depot, trip_xys, tour, random_distortion)
         trip_var = evalu_var(model, trip_xys)
         if trip_var > trip_var_max:
             trip_var_max = trip_var
