@@ -1,6 +1,7 @@
 from aux import *
 from numpy.random import normal, uniform
 from functions import *
+from random import randint
 
 # Induce model.
 side, budget, na, nb, f = 4, 40, 100000000, 100, f5
@@ -12,6 +13,8 @@ model.fit(first_xys, first_zs)
 trip_xys, trip_zs, trip_var_min, a, depot = [], [], 9999999, 0, (-0.0000001, -0.0000001)
 while a < na:
     # Add maximum amount of feasible points for the given budget.
+    tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
+    old_tour = tour
     while True:
         trip_xys += [(uniform(), uniform())]
         tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
@@ -24,7 +27,6 @@ while a < na:
     # Add points between neighboring cities.
     # while True:
 
-    
     trip_var_max = evalu_var(model, trip_xys)
     new_trip_xys = trip_xys.copy()
     b = 0
@@ -39,7 +41,6 @@ while a < na:
         b += 1
     trip_xys = new_trip_xys.copy()
 
-    
     # Induce model with simulated points.
     trip_zs = model.predict(trip_xys, return_std=False)
     # kernel = kernel_selector(first_xys + trip_xys, first_zs + list(trip_zs))
@@ -54,7 +55,6 @@ while a < na:
     else:
         trip_xys = new_trip_xys2.copy()
 
-    
     # Logging.
     # print(trip_xys)
     # kernel = kernel_selector(first_xys + trip_xys, first_zs + probe(f, trip_xys)) #TODO descomentar na versão final
@@ -64,8 +64,11 @@ while a < na:
     print(trip_var_min, error, sep='\t')
 
     # Remove city at random.
-    random.shuffle(trip_xys)
-    del trip_xys[-1]
+    e = randint(0, len(trip_xys) - 1)
+    del trip_xys[e]
+    # tour.remove(e)
+    # old_tour.remove(e)
+
     a += 1
 
 trip_xys = new_trip_xys2.copy()
