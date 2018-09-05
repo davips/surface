@@ -244,6 +244,15 @@ def distort(depot, trip_xys, tour, distortion_function):
         trip_xys[idb - 1] = distortion_function(a, b, c, d, e, f)
 
 
+def distort1(depot, trip_xys, tour, distortion_function):
+    """Apply a custom distortion function to one random point between depot and last."""
+    points = [depot] + trip_xys
+    ttt = list(zip(tour, tour[1:], tour[2:]))
+    ida, idb, idc = random.choice(ttt)
+    (a, b), (c, d), (e, f) = points[ida], points[idb], points[idc]
+    trip_xys[idb - 1] = distortion_function(a, b, c, d, e, f)
+
+
 def no_distortion(a, b, c, d, e, f):
     return c, d
 
@@ -259,3 +268,7 @@ def median_distortion(a, b, c, d, e, f):
 def random_distortion(a, b, c, d, e, f):
     s = 0.01 * (dist(a, b, c, d) + dist(c, d, e, f)) / 2
     return c + normal(scale=s), d + normal(scale=s)
+
+
+def current_milli_time():
+    return int(round(time.time() * 1000))
