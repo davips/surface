@@ -1,7 +1,9 @@
+from sys import argv
 from aux import *
 from numpy.random import normal, uniform
 from functions import *
 from random import randint
+from plotter import Plotter
 
 # Induce model.
 side, budget, na, nb, f = 4, 40, 100000000, 100, f5
@@ -10,8 +12,9 @@ kernel = kernel_selector(first_xys, first_zs)
 model = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=5, copy_X_train=True)
 model.fit(first_xys, first_zs)
 
-trip_xys, trip_zs, trip_var_min, a, depot = [], [], 9999999, 0, (-0.0000001, -0.0000001)
-for a in range(0,na):
+trip_xys, trip_zs, trip_var_min, a, depot, plot = [], [], 9999999, 0, (-0.0000001, -0.0000001), argv[1] == 'p'
+if plot: plotter = Plotter('surface')
+for a in range(0, na):
     # Add maximum amount of feasible points for the given budget.
     tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
     old_tour = tour
@@ -36,6 +39,7 @@ for a in range(0,na):
         if feasible and trip_var > trip_var_max:
             trip_var_max = trip_var
             new_trip_xys = trip_xys.copy()
+            if plot: plotter.path([depot] + trip_xys, tour)
         else:
             trip_xys = new_trip_xys.copy()
         b += 1
@@ -62,6 +66,11 @@ for a in range(0,na):
     model3.fit(first_xys + trip_xys, first_zs + probe(f, trip_xys))
     error = evalu_sum(model3, TSxy, TSz)
     print(trip_var_min, error, sep='\t')
+
+    # Plotting.
+    if plot:
+        tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
+        plotter.path([depot] + trip_xys, tour)
 
     # Remove city at random.
     e = randint(0, len(trip_xys) - 1)
