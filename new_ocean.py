@@ -6,9 +6,10 @@ from random import randint
 from plotter import Plotter
 
 # Induce model.
-side, budget, na, nb, f = 4, 6, 100000000, 100, f5
+side, budget, na, nb, f = 4, 36, 100000000, 100, f5
 (first_xys, first_zs), (TSxy, TSz) = train_data(side, f), test_data(f)
-kernel = RBF(length_scale_bounds=(0.0001, 10000))  # TODO: kernel_selector(first_xys, first_zs)
+kernel = Matern(length_scale_bounds=(0.000001, 100000), nu=1.6) #TODO kernel_selector(first_xys, first_zs)
+print(type(kernel))
 model = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=25, copy_X_train=True, random_state=42)
 model.fit(first_xys, first_zs)
 
@@ -26,9 +27,6 @@ while True:
     if plot: plotter.path([depot] + trip_xys, tour)
     old_tour = tour.copy()
 
-last_error = 0
-last_var = 0
-last_trip = []
 for a in range(0, na):
     # Add points between neighboring cities.
     old_tour = tour.copy()
@@ -62,7 +60,7 @@ for a in range(0, na):
     # Induce model with simulated points.
     trip_zs = model.predict(trip_xys, return_std=False)
     # kernel = kernel_selector(first_xys + trip_xys, first_zs + list(trip_zs))
-    model2 = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=5, copy_X_train=True)
+    model2 = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=25, copy_X_train=True)
     model2.fit(first_xys + trip_xys, first_zs + list(trip_zs))
 
     trip_var = evalu_var(model2, TSxy)
@@ -79,11 +77,6 @@ for a in range(0, na):
     model3.fit(first_xys + trip_xys, first_zs + probe(f, trip_xys))
     error = evalu_sum(model3, TSxy, TSz)
     print(trip_var_min, error, sep='\t')
-
-    if last_error != error and last_var == trip_var_min: print(last_error, error, trip_xys, last_trip, sep='\n-------\n')
-    last_error = error
-    last_var = trip_var_min
-    last_trip = trip_xys.copy()
 
     # Plotting.
     if plot:
