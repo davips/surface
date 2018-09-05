@@ -14,18 +14,19 @@ model.fit(first_xys, first_zs)
 
 trip_xys, trip_zs, trip_var_min, a, depot, plot = [], [], 9999999, 0, (-0.0000001, -0.0000001), argv[1] == 'p'
 if plot: plotter = Plotter('surface')
-for a in range(0, na):
-    # Add maximum amount of feasible points for the given budget.
+
+# Add maximum amount of feasible points for the given budget.
+while True:
+    trip_xys += [(uniform(), uniform())]
     tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
+    if not feasible:
+        trip_xys = trip_xys[:-1]
+        tour = old_tour.copy()
+        break
+    if plot: plotter.path([depot] + trip_xys, tour)
     old_tour = tour.copy()
-    while True:
-        trip_xys += [(uniform(), uniform())]
-        tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
-        if not feasible:
-            trip_xys = trip_xys[:-1]
-            tour = old_tour.copy()
-            break
-        old_tour = tour.copy()
+
+for a in range(0, na):
 
     # Add points between neighboring cities.
     # while True:
@@ -73,9 +74,11 @@ for a in range(0, na):
         plotter.path([depot] + trip_xys, tour)
 
     # Remove city at random.
-    e = randint(0, len(trip_xys) - 1)
+    l = len(trip_xys)
+    e = randint(0, l - 1)
     del trip_xys[e]
-    # tour.remove(e)
-    # old_tour.remove(e)
+    tour.remove(e)
+    for i in range(0, l):
+        if tour[i] > e: tour[i] -= 1
 
 trip_xys = new_trip_xys2.copy()
