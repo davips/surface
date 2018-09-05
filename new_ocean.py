@@ -17,7 +17,7 @@ if plot: plotter = Plotter('surface')
 for a in range(0, na):
     # Add maximum amount of feasible points for the given budget.
     tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
-    old_tour = tour
+    old_tour = tour.copy()
     while True:
         trip_xys += [(uniform(), uniform())]
         tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
