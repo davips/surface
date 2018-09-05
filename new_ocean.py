@@ -11,7 +11,7 @@ model = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=5, copy_X_t
 model.fit(first_xys, first_zs)
 
 trip_xys, trip_zs, trip_var_min, a, depot = [], [], 9999999, 0, (-0.0000001, -0.0000001)
-while a < na:
+for a in range(0,na):
     # Add maximum amount of feasible points for the given budget.
     tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
     old_tour = tour
@@ -29,8 +29,7 @@ while a < na:
 
     trip_var_max = evalu_var(model, trip_xys)
     new_trip_xys = trip_xys.copy()
-    b = 0
-    while b < nb:
+    for b in range(0, nb):
         distort1(depot, trip_xys, tour, random_distortion)
         tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
         if feasible: trip_var = evalu_var(model, trip_xys)
@@ -69,7 +68,5 @@ while a < na:
     del trip_xys[e]
     # tour.remove(e)
     # old_tour.remove(e)
-
-    a += 1
 
 trip_xys = new_trip_xys2.copy()
