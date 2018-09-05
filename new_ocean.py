@@ -8,7 +8,7 @@ from plotter import Plotter
 # Induce model.
 side, budget, na, nb, f = 4, 40, 100000000, 100, f5
 (first_xys, first_zs), (TSxy, TSz) = train_data(side, f), test_data(f)
-kernel = kernel_selector(first_xys, first_zs)
+kernel = RBF(length_scale_bounds=(0.0001, 10000)) #TODO: kernel_selector(first_xys, first_zs)
 model = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=5, copy_X_train=True)
 model.fit(first_xys, first_zs)
 
@@ -17,7 +17,7 @@ if plot: plotter = Plotter('surface')
 
 # Add maximum amount of feasible points for the given budget.
 while True:
-    trip_xys += [(uniform(), uniform())]
+    trip_xys.append((uniform(), uniform()))
     tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
     if not feasible:
         trip_xys = trip_xys[:-1]
@@ -31,6 +31,7 @@ for a in range(0, na):
     # Add points between neighboring cities.
     # while True:
 
+    # Distort one city at a time.
     trip_var_max = evalu_var(model, trip_xys)
     new_trip_xys = trip_xys.copy()
     for b in range(0, nb):
