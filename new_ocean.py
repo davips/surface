@@ -6,7 +6,7 @@ from random import randint
 from plotter import Plotter
 
 # Induce model.
-side, budget, na, nb, f = 4, 10, 100000000, 100, f5
+side, budget, na, nb, f = 4, 30, 100000000, 100, f5
 (first_xys, first_zs), (TSxy, TSz) = train_data(side, f), test_data(f)
 kernel = RBF(length_scale_bounds=(0.0001, 10000)) #TODO: kernel_selector(first_xys, first_zs)
 model = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=5, copy_X_train=True)
