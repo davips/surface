@@ -7,11 +7,11 @@ from plotter import Plotter
 
 # Induce model.
 print("out: Início")
-side, budget, na, nb, f = 4, 100, 100000000, 3000, f5
+side, budget, na, nb, f = 4, 100, 100000000, 30, f5
 (first_xys, first_zs), (TSxy, TSz) = train_data(side, f), test_data(f)
 print("out: Select initial kernel.")
-# kernel = Matern(length_scale_bounds=(0.000001, 100000), nu=1.6)
-kernel = kernel_selector(first_xys, first_zs)
+kernel = Matern(length_scale_bounds=(0.000001, 100000), nu=1.6)
+# TODO kernel = kernel_selector(first_xys, first_zs)
 print(type(kernel))
 model = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=25, copy_X_train=True, random_state=42)
 model.fit(first_xys, first_zs)
@@ -64,7 +64,7 @@ for a in range(0, na):
     trip_xys = new_trip_xys.copy()
 
     # Induce model with simulated points.
-    print("out: Inducing with simulated...")
+    print("out: Inducing with simulated data...")
     trip_zs = model.predict(trip_xys, return_std=False)
     # kernel = kernel_selector(first_xys + trip_xys, first_zs + list(trip_zs))
     model2 = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=25, copy_X_train=True)
@@ -79,8 +79,8 @@ for a in range(0, na):
         trip_xys = new_trip_xys2.copy()
 
     # Logging.
-    print("out: Inducing with real to evaluate error...")
-    kernel = kernel_selector(first_xys + trip_xys, first_zs + probe(f, trip_xys)) #TODO descomentar na versão final
+    print("out: Inducing with real data to evaluate error...")
+    # kernel = kernel_selector(first_xys + trip_xys, first_zs + probe(f, trip_xys)) #TODO descomentar na versão final
     model3 = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=25, copy_X_train=True, random_state=42)
     model3.fit(first_xys + trip_xys, first_zs + probe(f, trip_xys))
     error = evalu_sum(model3, TSxy, TSz)
