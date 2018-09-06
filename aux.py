@@ -14,18 +14,15 @@ from sklearn.gaussian_process.kernels import WhiteKernel, RationalQuadratic, RBF
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.model_selection import cross_val_score
 import math
-import random
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D  # Esse import evita "ValueError: Unknown projection '3d'"
 from tsp import solve_tsp, sequence  # exact
 from tsp import multistart_localsearch  # heuristic
 import time
 import itertools
-from numpy.random import normal, uniform
+from numpy.random import normal, uniform, randint, seed
 
 ngrid = 100
-SEED = 142
-
 
 def kernel_selector(xys, zs, seed=42):
     # define limits of the hyperparameter space
@@ -54,11 +51,11 @@ def kernel_selector(xys, zs, seed=42):
     return min_error_kernel
 
 
-def train_data(l, f, seed=SEED):
-    return data(f, l, seed + 1)
+def train_data(l, f):
+    return data(f, l)
 
 
-def test_data(f, seed=SEED):
+def test_data(f):
     mesh, zs = [], []
     for i in range(101):
         for j in range(101):
@@ -73,13 +70,12 @@ def test_data(f, seed=SEED):
     return mesh, zs
 
 
-def data(f, n2, seed=SEED):
-    random.seed(seed)
+def data(f, n2):
     xys, zs = [], []
     for x in [i / n2 for i in range(1, n2)]:
         for y in [i / n2 for i in range(1, n2)]:
-            x = random.random()
-            y = random.random()
+            x = uniform()
+            y = uniform()
             xys.append((x, y))
             zs.append(f(x, y))
             # print("{}\t&{}\t&{}\\\\".format(x, y, zs[-1]))
@@ -90,7 +86,7 @@ def gp(xys, zs):
     from sklearn.gaussian_process.kernels import WhiteKernel, RationalQuadratic
     from sklearn.gaussian_process import GaussianProcessRegressor
     kernel = RationalQuadratic(length_scale_bounds=(0.08, 100)) + WhiteKernel(noise_level_bounds=(1e-5, 1e-2))
-    gpr = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10, copy_X_train=True)
+    gpr = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10, copy_X_train=True, seed=42)
     gpr.fit(xys, zs)
     return gpr
 
@@ -248,7 +244,7 @@ def distort1(depot, trip_xys, tour, distortion_function):
     """Apply a custom distortion function to one random point between depot and last."""
     points = [depot] + trip_xys
     ttt = list(zip(tour, tour[1:], tour[2:]))
-    ida, idb, idc = random.choice(ttt)
+    ida, idb, idc = ttt[randint(len(ttt) - 2)]
     (a, b), (c, d), (e, f) = points[ida], points[idb], points[idc]
     trip_xys[idb - 1] = distortion_function(a, b, c, d, e, f)
 
@@ -257,7 +253,7 @@ def middle_insertion(depot, trip_xys, tour):
     """Add new point between two adjacent random points."""
     points = [depot] + trip_xys
     ttt = list(zip(tour, tour[1:]))
-    ida, idb = random.choice(ttt)
+    ida, idb = ttt[randint(len(ttt) - 1)]
     (a, b), (c, d) = points[ida], points[idb]
     m, n = (a + c) / 2, (b + d) / 2
     trip_xys.append((m, n))

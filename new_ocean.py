@@ -1,13 +1,15 @@
 from sys import argv
 from aux import *
-from numpy.random import normal, uniform
+from numpy.random import normal, uniform, seed, randint
 from functions import *
-from random import randint
 from plotter import Plotter
+
+seed(int(argv[2]))
 
 # Induce model.
 print("out: Início")
-side, budget, na, nb, f = 4, 100, 100, 30, f5
+side, budget = 4, 100
+na, nb, f = int(argv[3]), int(argv[4]), f5
 (first_xys, first_zs), (TSxy, TSz) = train_data(side, f), test_data(f)
 print("out: Select initial kernel.")
 # kernel = Matern(length_scale_bounds=(0.000001, 100000), nu=1.6)
@@ -79,7 +81,7 @@ for a in range(0, na):
     print("out: Inducing with simulated data...")
     trip_zs = model.predict(trip_xys, return_std=False)
     # kernel = kernel_selector(first_xys + trip_xys, first_zs + list(trip_zs))
-    model2 = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=25, copy_X_train=True)
+    model2 = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=25, copy_X_train=True, random_state=42)
     model2.fit(first_xys + trip_xys, first_zs + list(trip_zs))
 
     trip_var = evalu_var(model2, TSxy)
@@ -104,7 +106,7 @@ for a in range(0, na):
         plotter.path([depot] + trip_xys, tour)
 
     # Remove city at random.
-    e = randint(0, len(trip_xys) - 1)
+    e = randint(len(trip_xys))
     del trip_xys[e]
     tour.remove(e)
     for i in range(0, len(tour)):

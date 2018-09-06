@@ -74,15 +74,6 @@ class _data:
         self.sigma[10] = 0.029318
 
 
-# import random
-# r = random.random()
-# str = """
-#         self.x[%d],self.y[%d] = %.5g,%.5g
-#         self.a[%d] = %.5g
-#         self.sigma[%d] = %.5g
-# """
-# i +=1; print(str % (i,i,r(), r(),  i,100*r(), i,r()*r()))
-
 data = _data()
 
 

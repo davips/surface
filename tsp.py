@@ -22,7 +22,7 @@ Copyright (c) by Joao Pedro PEDROSO and Mikio KUBO, 2012
 """
 import math
 import time
-import random
+from numpy.random import shuffle, uniform, seed
 import networkx
 from gurobipy import *
 
@@ -95,8 +95,8 @@ def distance(x1,y1,x2,y2):
 def make_data(n):
     """make_data: compute matrix distance based on euclidean distance"""
     V = range(1,n+1)
-    x = dict([(i,random.random()) for i in V])
-    y = dict([(i,random.random()) for i in V])
+    x = dict([(i,uniform()) for i in V])
+    y = dict([(i,uniform()) for i in V])
     c = {}
     for i in V:
         for j in V:
@@ -178,7 +178,6 @@ Copyright (c) by Joao Pedro PEDROSO and Mikio KUBO, 2007
 """
 
 import math
-import random
 
 
 def mk_closest(D, n):
@@ -206,7 +205,7 @@ def length(tour, D):
 def randtour(n):
     """Construct a random tour of size 'n'."""
     sol = list(range(n))  # set solution equal to [0,1,...,n-1]
-    random.shuffle(sol)  # place it in a random order
+    shuffle(sol)  # place it in a random order
     return sol
 
 
@@ -382,7 +381,7 @@ if __name__ == "__main__":
     # test the functions:
     #
 
-    # random.seed(1)	# uncomment for having always the same behavior
+    # seed(1)	# uncomment for having always the same behavior
     import sys
 
     if len(sys.argv) == 1:
