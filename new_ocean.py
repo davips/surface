@@ -7,11 +7,11 @@ from plotter import Plotter
 
 # Induce model.
 print("out: Início")
-side, budget, na, nb, f = 4, 100, 100000000, 30, f5
+side, budget, na, nb, f = 4, 100, 100, 30, f5
 (first_xys, first_zs), (TSxy, TSz) = train_data(side, f), test_data(f)
 print("out: Select initial kernel.")
-kernel = Matern(length_scale_bounds=(0.000001, 100000), nu=1.6)
-# TODO kernel = kernel_selector(first_xys, first_zs)
+# kernel = Matern(length_scale_bounds=(0.000001, 100000), nu=1.6)
+kernel = kernel_selector(first_xys, first_zs)
 print(type(kernel))
 model = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=25, copy_X_train=True, random_state=42)
 model.fit(first_xys, first_zs)
@@ -32,6 +32,18 @@ while True:
     old_tour = tour.copy()
 
 for a in range(0, na):
+    # # Add maximum amount of feasible points for the given budget.
+    # tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
+    # old_tour = tour.copy()
+    # while True:
+    #     trip_xys.append((uniform(), uniform()))
+    #     tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
+    #     if not feasible:
+    #         trip_xys = trip_xys[:-1]
+    #         tour = old_tour.copy()
+    #         break
+    #     old_tour = tour.copy()
+
     # Add points between neighboring cities.
     print('out: Adding neighbors...')
     old_tour = tour.copy()
