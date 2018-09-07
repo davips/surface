@@ -1,115 +1,77 @@
 from sys import argv
-from aux import *
-from numpy.random import normal, uniform, seed, randint
+from aux import train_data, test_data, evalu_var, evalu_sum, probe, distort1, random_distortion
+from numpy.random import seed, randint
 from functions import *
 from plotter import Plotter
+from trip import *
 
 seed(int(argv[2]))
+plot, budget, na, nb, side, f = argv[1] == 'p', 8, int(argv[3]), int(argv[4]), int(argv[5]), f5
+(first_xys, first_zs), (TSxy, TSz), depot, max_failures = train_data(side, f, False), test_data(f), (-0.0000001, -0.0000001), nb / 5
+plotter = Plotter('surface') if plot else None
+trip = Trip(depot, first_xys, first_zs, budget, plotter)
+# trip.select_kernel() TODO
+trip.fit()
+trip_var_min = 9999999
 
-# Induce model.
-print("out: Início")
-side, budget = 4, 100
-na, nb, f = int(argv[3]), int(argv[4]), f5
-(first_xys, first_zs), (TSxy, TSz) = train_data(side, f), test_data(f)
-print("out: Select initial kernel.")
-# kernel = Matern(length_scale_bounds=(0.000001, 100000), nu=1.6)
-kernel = kernel_selector(first_xys, first_zs)
-print(type(kernel))
-model = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=25, copy_X_train=True, random_state=42)
-model.fit(first_xys, first_zs)
-
-trip_xys, trip_zs, trip_var_min, a, depot, plot = [], [], 9999999, 0, (-0.0000001, -0.0000001), argv[1] == 'p'
-if plot: plotter = Plotter('surface')
-
-# Add maximum amount of feasible points for the given budget.
 print('out: Adding random...')
-while True:
-    trip_xys.append((uniform(), uniform()))
-    tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
-    if not feasible:
-        trip_xys = trip_xys[:-1]
-        tour = old_tour.copy()
-        break
-    if plot: plotter.path([depot] + trip_xys, tour)
-    old_tour = tour.copy()
+trip.try_while_possible(trip.add_random_point)
 
 for a in range(0, na):
-    # # Add maximum amount of feasible points for the given budget.
-    # tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
-    # old_tour = tour.copy()
-    # while True:
-    #     trip_xys.append((uniform(), uniform()))
-    #     tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
-    #     if not feasible:
-    #         trip_xys = trip_xys[:-1]
-    #         tour = old_tour.copy()
-    #         break
-    #     old_tour = tour.copy()
-
-    # Add points between neighboring cities.
     print('out: Adding neighbors...')
-    old_tour = tour.copy()
-    old_trip_xys = trip_xys.copy()
-    while True:
-        middle_insertion(depot, trip_xys, tour)
-        tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
-
-        if not feasible:
-            trip_xys = old_trip_xys.copy()
-            tour = old_tour.copy()
-            break
-        old_trip_xys = trip_xys.copy()
-        old_tour = tour.copy()
+    trip.try_while_possible(trip.middle_insertion)
 
     # Distort one city at a time.
     print('out: Distorting...')
-    trip_var_max = evalu_var(model, trip_xys)
-    new_trip_xys = trip_xys.copy()
+    trip_var_max = evalu_var(trip.model, trip.xys)
+    new_trip_xys = trip.xys.copy()
+    failures = 0
     for b in range(0, nb):
-        distort1(depot, trip_xys, tour, random_distortion)
-        tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
-        if feasible: trip_var = evalu_var(model, trip_xys)
-        if feasible and trip_var > trip_var_max:
+        distort1(trip.depot, trip.xys, trip.tour, random_distortion)
+        trip.calculate_tour()
+        if trip.feasible: trip_var = evalu_var(trip.model, trip.xys)
+        if trip.feasible and trip_var > trip_var_max:
             trip_var_max = trip_var
-            new_trip_xys = trip_xys.copy()
+            new_trip_xys = trip.xys.copy()
         else:
-            trip_xys = new_trip_xys.copy()
-        b += 1
-    trip_xys = new_trip_xys.copy()
+            # failures += 1
+            # if failures > max_failures: break
+            trip.xys = new_trip_xys.copy()
 
-    # Induce model with simulated points.
+    trip.xys = new_trip_xys.copy()
+
     print("out: Inducing with simulated data...")
-    trip_zs = model.predict(trip_xys, return_std=False)
-    # kernel = kernel_selector(first_xys + trip_xys, first_zs + list(trip_zs))
-    model2 = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=25, copy_X_train=True, random_state=42)
-    model2.fit(first_xys + trip_xys, first_zs + list(trip_zs))
+    zs = trip.model.predict(trip.xys, return_std=False)
+    trip2 = Trip(depot, first_xys + trip.xys, first_zs + list(zs), budget, plotter)
+    trip2.fit(trip.kernel)
 
-    trip_var = evalu_var(model2, TSxy)
+    trip_var = evalu_var(trip2.model, TSxy)
 
     if trip_var < trip_var_min:
         trip_var_min = trip_var
-        new_trip_xys2 = trip_xys.copy()
+        new_trip_xys2 = trip.xys.copy()
     else:
-        trip_xys = new_trip_xys2.copy()
+        trip.xys = new_trip_xys2.copy()
 
     # Logging.
     print("out: Inducing with real data to evaluate error...")
-    # kernel = kernel_selector(first_xys + trip_xys, first_zs + probe(f, trip_xys)) #TODO descomentar na versão final
-    model3 = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=25, copy_X_train=True, random_state=42)
-    model3.fit(first_xys + trip_xys, first_zs + probe(f, trip_xys))
-    error = evalu_sum(model3, TSxy, TSz)
+    zs = trip.model.predict(trip.xys, return_std=False)
+    trip3 = Trip(depot, first_xys + trip.xys, first_zs + probe(f, trip.xys), budget, plotter)
+    # trip3.kernel_selector() #TODO descomentar na versão final e tirar kernel abaixo
+    trip3.fit(trip.kernel)
+    error = evalu_sum(trip3.model, TSxy, TSz)
     print(trip_var_min, error, sep='\t')
 
     # Plotting.
     if plot:
-        tour, feasible, cost = plan_tour([depot] + trip_xys, budget, exact=True)
-        plotter.path([depot] + trip_xys, tour)
+        trip.calculate_tour()
+        trip.plot()
 
     # Remove city at random.
-    e = randint(len(trip_xys))
-    del trip_xys[e]
-    tour.remove(e)
-    for i in range(0, len(tour)):
-        if tour[i] > e: tour[i] -= 1
+    e = randint(len(trip.xys))
+    del trip.xys[e]
+    trip.tour.remove(e)
+    for i in range(0, len(trip.tour)):
+        if trip.tour[i] > e: trip.tour[i] -= 1
 
-trip_xys = new_trip_xys2.copy()
+trip.xys = new_trip_xys2.copy()

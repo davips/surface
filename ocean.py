@@ -11,7 +11,7 @@
 #     You should have received a copy of the GNU Lesser General Public License
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from plotter import Plotter
-from trip import *
+from oldtrip import *
 from aux import *
 from sys import argv
 import time
@@ -22,7 +22,7 @@ from swarm import *
 show, f, side, at_random, full_log, swarm, ga, distortionf, exact_search, penalize, verbose = parse_args(argv)
 (Pxy, Pz), (TSxy, TSz) = train_data(side, f), test_data(f)  # generate list P with points from previous probing and testing data
 depot, attempts = (-0.0000001, -0.0000001), 3000
-trip = Trip(exact_search, depot, Pxy, Pz, TSxy, penalize, debug=verbose)
+trip = OldTrip(exact_search, depot, Pxy, Pz, TSxy, penalize, debug=verbose)
 if show != 'none': plotter = Plotter('surface')
 for budget in range(10, 200, 20):
     # Add maximum amount of feasible points for the given budget.
@@ -70,12 +70,12 @@ for budget in range(10, 200, 20):
     if show == 'path': plotter.path([depot] + trip.future_xys, trip.gettour(budget))
     if show == 'fun': plotter.surface(lambda x, y: f(x, y), 30, 0, 50)
     if show == 'est':  # estimated function after performing all probings
-        trip2 = Trip(exact_search, depot, Pxy + trip.future_xys, Pz + probe(f, trip.future_xys), TSxy, penalize, debug=not True)
+        trip2 = OldTrip(exact_search, depot, Pxy + trip.future_xys, Pz + probe(f, trip.future_xys), TSxy, penalize, debug=not True)
         plotter.surface(lambda x, y: trip2.getmodel().predict([(x, y)])[0], 30, 0, 50)
 
     # Logging.
     if full_log:  # calculate error after all probings and rechoosing kernel
-        trip2 = Trip(exact_search, depot, Pxy + trip.future_xys, Pz + probe(f, trip.future_xys), TSxy, penalize, debug=not True)
+        trip2 = OldTrip(exact_search, depot, Pxy + trip.future_xys, Pz + probe(f, trip.future_xys), TSxy, penalize, debug=not True)
         print('out:\t' + fmt(trip.getcost(budget)) + '\t' + fmt(trip.getvar()) + '\t' + fmt(trip2.geterr_on(TSxy, TSz)) + '\t' + 'err\tlength=\t', len(trip.future_xys), '\t', (type(trip2.getmodel().kernel).__name__[:12]).expandtabs(13))
     else:
         print('out:\t' + fmt(trip.getcost(budget)) + '\t' + fmt(trip.getvar()) + '\tvar\tlength=\t', len(trip.future_xys))
