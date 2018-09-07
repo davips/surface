@@ -10,7 +10,7 @@
 #
 #     You should have received a copy of the GNU Lesser General Public License
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from trip import *
+from oldtrip import *
 from time import *
 from functions import *
 from ga import *

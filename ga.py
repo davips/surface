@@ -15,7 +15,7 @@ from pswarm_py import pswarm
 from numpy import zeros
 from numpy import ones
 from aux import *
-from trip import *
+from oldtrip import *
 from numpy.random import normal, uniform
 
 popsize = 49

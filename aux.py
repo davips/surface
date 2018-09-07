@@ -24,6 +24,7 @@ from numpy.random import normal, uniform, randint, seed
 
 ngrid = 100
 
+
 def kernel_selector(xys, zs, seed=42):
     # define limits of the hyperparameter space
     # bounds = [(0.00001, 0.0001), (0.0001, 0.001), (0.001, 0.01), (0.01, 0.1), (0.1, 1), (1, 10), (10, 100), (100, 1000), (1000, 10000), (10000, 100000)]
@@ -51,8 +52,8 @@ def kernel_selector(xys, zs, seed=42):
     return min_error_kernel
 
 
-def train_data(l, f):
-    return data(f, l)
+def train_data(l, f, rnd):
+    return data(f, l, rnd)
 
 
 def test_data(f):
@@ -70,12 +71,13 @@ def test_data(f):
     return mesh, zs
 
 
-def data(f, n2):
+def data(f, n2, rnd):
     xys, zs = [], []
-    for x in [i / n2 for i in range(1, n2)]:
-        for y in [i / n2 for i in range(1, n2)]:
-            x = uniform()
-            y = uniform()
+    for x in [i / n2 for i in range(0, n2)]:
+        for y in [i / n2 for i in range(0, n2)]:
+            if rnd:
+                x = uniform()
+                y = uniform()
             xys.append((x, y))
             zs.append(f(x, y))
             # print("{}\t&{}\t&{}\\\\".format(x, y, zs[-1]))
@@ -247,16 +249,6 @@ def distort1(depot, trip_xys, tour, distortion_function):
     ida, idb, idc = ttt[randint(len(ttt) - 2)]
     (a, b), (c, d), (e, f) = points[ida], points[idb], points[idc]
     trip_xys[idb - 1] = distortion_function(a, b, c, d, e, f)
-
-
-def middle_insertion(depot, trip_xys, tour):
-    """Add new point between two adjacent random points."""
-    points = [depot] + trip_xys
-    ttt = list(zip(tour, tour[1:]))
-    ida, idb = ttt[randint(len(ttt) - 1)]
-    (a, b), (c, d) = points[ida], points[idb]
-    m, n = (a + c) / 2, (b + d) / 2
-    trip_xys.append((m, n))
 
 
 def no_distortion(a, b, c, d, e, f):
