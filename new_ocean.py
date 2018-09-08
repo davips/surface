@@ -46,11 +46,7 @@ for a in range(0, na):
     trip.calculate_tour()
 
     print("out: Inducing with simulated data...")
-    zs = trip.model.predict(trip.xys, return_std=False)
-    trip2 = Trip(depot, first_xys + trip.xys, first_zs + list(zs), budget, plotter)
-    trip2.fit(trip.kernel)
-
-    trip_var = evalu_var(trip2, TSxy)
+    trip_var = sum(trip.stds_simulated(TSxy))
     if trip_var < trip_var_min:
         trip_var_min = trip_var
         new_trip_xys2 = trip.xys.copy()
@@ -63,7 +59,7 @@ for a in range(0, na):
     # # trip3.kernel_selector() # TODO descomentar na versão final e tirar kernel abaixo
     # trip3.fit(trip.kernel)
     # error = evalu_sum(trip3.model, TSxy, TSz)
-    print(current_milli_time() - start, trip_var, trip_var_min, trip.model_time + trip2.model_time, trip.pred_time + trip2.pred_time, trip.tour_time, sep='\t')
+    print(current_milli_time() - start, trip_var, trip_var_min, trip.model_time, trip.pred_time, trip.simu_time, trip.tour_time, sep='\t')
 
     # Plotting.
     if plot:
