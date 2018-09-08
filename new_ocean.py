@@ -10,7 +10,7 @@ plot, budget, na, nb, side, f = argv[1] == 'p', 8, int(argv[3]), int(argv[4]), i
 (first_xys, first_zs), (TSxy, TSz), depot, max_failures = train_data(side, f, False), test_data(f), (-0.0000001, -0.0000001), nb / 5
 plotter = Plotter('surface') if plot else None
 trip = Trip(depot, first_xys, first_zs, budget, plotter)
-# trip.select_kernel() TODO
+trip.select_kernel()  # TODO
 trip.fit()
 trip_var_min = 9999999
 
