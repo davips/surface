@@ -102,7 +102,7 @@ class Trip:
         return preds
 
     def stds_simulated(self, xys):
-        zs = self.predict(self.xys)
+        zs = [] if len(self.xys) == 0 else self.predict(self.xys)
         trip2 = Trip(self.depot, self.first_xys + self.xys, self.first_zs + list(zs), self.budget)
         trip2.fit(self.kernel)
         stds = trip2.predict_stds(xys)
@@ -110,6 +110,10 @@ class Trip:
         self.pred_time += trip2.pred_time
         return stds
 
-    # def add_maxvar_point(self, xys):
-    #     stds = self.stds_simulated(xys)
-    #     self.xys.append((uniform(), uniform()))
+    def set_add_maxvar_point_xys(self, add_maxvar_point_xys):
+        self.add_maxvar_point_xys = add_maxvar_point_xys
+
+    def add_maxvar_point(self):
+        stds = list(self.stds_simulated(self.add_maxvar_point_xys))
+        idx = stds.index(max(stds))
+        self.xys.append(self.add_maxvar_point_xys[idx])

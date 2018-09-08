@@ -15,7 +15,9 @@ trip.fit()
 trip_var_min = 9999999
 
 print('out: Adding random...')
-trip.try_while_possible(trip.add_random_point)
+trip.set_add_maxvar_point_xys(TSxy)
+trip.try_while_possible(trip.add_maxvar_point)
+# trip.try_while_possible(trip.add_random_point)
 
 start = current_milli_time()
 for a in range(0, na):
@@ -53,13 +55,13 @@ for a in range(0, na):
     else:
         trip.xys = new_trip_xys2.copy()
 
-    # # Logging.
-    # print("out: Inducing with real data to evaluate error...")
-    # trip3 = Trip(depot, first_xys + trip.xys, first_zs + probe(f, trip.xys), budget, plotter)
-    # # trip3.kernel_selector() # TODO descomentar na versão final e tirar kernel abaixo
-    # trip3.fit(trip.kernel)
-    # error = evalu_sum(trip3.model, TSxy, TSz)
-    print(current_milli_time() - start, trip_var, trip_var_min, trip.model_time, trip.pred_time, trip.tour_time, sep='\t')
+    # Logging.
+    print("out: Inducing with real data to evaluate error...")
+    trip3 = Trip(depot, first_xys + trip.xys, first_zs + probe(f, trip.xys), budget, plotter)
+    trip3.kernel_selector() # TODO descomentar na versão final e tirar kernel abaixo
+    trip3.fit(trip.kernel)
+    error = evalu_sum(trip3.model, TSxy, TSz)
+    print(current_milli_time() - start, trip_var, trip_var_min, error, trip.model_time, trip.pred_time, trip.tour_time, sep='\t')
 
     # Plotting.
     if plot:
