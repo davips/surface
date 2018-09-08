@@ -13,7 +13,7 @@
 from sklearn.gaussian_process.kernels import Matern
 from numpy.random import uniform, randint
 from plotter import Plotter
-from aux import kernel_selector, plan_tour
+from aux import kernel_selector, plan_tour, current_milli_time
 from sklearn.gaussian_process import GaussianProcessRegressor
 
 
@@ -34,6 +34,9 @@ class Trip:
         self.xys, self.zs, self.tour = [], [], []
         self.plotter = plotter
         self.budget = budget
+        self.model_time = 0
+        self.tour_time = 0
+        self.pred_time = 0
 
     def plot(self):
         if self.plotter is not None: plotter.path([depot] + self.xys, tour)
@@ -42,15 +45,19 @@ class Trip:
         self.kernel = kernel_selector(self.first_xys, self.first_zs)
 
     def fit(self, kernel=None):
+        start = current_milli_time()
         if kernel == None: kernel = self.kernel
         self.model = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=25, copy_X_train=True, random_state=42)
         self.model.fit(self.first_xys, self.first_zs)
+        self.model_time += current_milli_time() - start
 
     def add_random_point(self):
         self.xys.append((uniform(), uniform()))
 
     def calculate_tour(self):
+        start = current_milli_time()
         self.tour, self.feasible, self.cost = plan_tour([self.depot] + self.xys, self.budget, exact=True)
+        self.tour_time += current_milli_time() - start
 
     def store(self):
         self.stored_trip_xys = self.xys.copy()
@@ -79,3 +86,9 @@ class Trip:
         (a, b), (c, d) = points[ida], points[idb]
         m, n = (a + c) / 2, (b + d) / 2
         self.xys.append((m, n))
+
+    def predict_stds(self, xys):
+        start = current_milli_time()
+        _, stds = self.model.predict(xys, return_std=True)
+        self.pred_time += current_milli_time() - start
+        return stds

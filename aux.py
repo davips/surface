@@ -165,8 +165,8 @@ def evalu_sum(g, xys, zs):
     return sum([abs(a - b) for a, b in zip(zs, predzs)])
 
 
-def evalu_var(g, xys):
-    predzs, stds = g.predict(xys, return_std=True)
+def evalu_var(trip, xys):
+    stds = trip.predict_stds(xys)
     return sum(stds)
 
 
