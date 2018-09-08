@@ -59,7 +59,7 @@ for a in range(0, na):
     # # trip3.kernel_selector() # TODO descomentar na versão final e tirar kernel abaixo
     # trip3.fit(trip.kernel)
     # error = evalu_sum(trip3.model, TSxy, TSz)
-    print(current_milli_time() - start, trip_var, trip_var_min, trip.model_time, trip.pred_time, trip.simu_time, trip.tour_time, sep='\t')
+    print(current_milli_time() - start, trip_var, trip_var_min, trip.model_time, trip.pred_time, trip.tour_time, sep='\t')
 
     # Plotting.
     if plot:

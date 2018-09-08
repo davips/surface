@@ -37,13 +37,14 @@ class Trip:
         self.model_time = 0
         self.tour_time = 0
         self.pred_time = 0
-        self.simu_time = 0
 
     def plot(self):
         if self.plotter is not None: plotter.path([depot] + self.xys, tour)
 
     def select_kernel(self):
+        start = current_milli_time()
         self.kernel = kernel_selector(self.first_xys, self.first_zs)
+        self.model_time += current_milli_time() - start
 
     def fit(self, kernel=None):
         start = current_milli_time()
@@ -94,13 +95,19 @@ class Trip:
         self.pred_time += current_milli_time() - start
         return stds
 
-    def stds_simulated(self, xys):
+    def predict(self, xys):
         start = current_milli_time()
-        zs = self.model.predict(self.xys, return_std=False)
+        preds = self.model.predict(xys, return_std=False)
+        self.pred_time += current_milli_time() - start
+        return preds
+
+    def stds_simulated(self, xys):
+        zs = self.predict(self.xys)
         trip2 = Trip(self.depot, self.first_xys + self.xys, self.first_zs + list(zs), self.budget)
         trip2.fit(self.kernel)
         stds = trip2.predict_stds(xys)
-        self.simu_time += current_milli_time() - start
+        self.model_time += trip2.model_time
+        self.pred_time += trip2.pred_time
         return stds
 
     # def add_maxvar_point(self, xys):
