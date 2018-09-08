@@ -34,11 +34,12 @@ for a in range(0, na):
             trip_var_max = trip_var
             new_trip_xys = trip.xys.copy()
         else:
-            # failures += 1
-            # if failures > max_failures: break
+            failures += 1
+            if failures > max_failures: break
             trip.xys = new_trip_xys.copy()
 
     trip.xys = new_trip_xys.copy()
+    trip.calculate_tour()
 
     print("out: Inducing with simulated data...")
     zs = trip.model.predict(trip.xys, return_std=False)
@@ -46,7 +47,6 @@ for a in range(0, na):
     trip2.fit(trip.kernel)
 
     trip_var = evalu_var(trip2.model, TSxy)
-
     if trip_var < trip_var_min:
         trip_var_min = trip_var
         new_trip_xys2 = trip.xys.copy()
@@ -64,7 +64,6 @@ for a in range(0, na):
 
     # Plotting.
     if plot:
-        trip.calculate_tour()
         trip.plot()
 
     # Remove city at random.
