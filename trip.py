@@ -117,3 +117,10 @@ class Trip:
         stds = list(self.stds_simulated(self.add_maxvar_point_xys))
         idx = stds.index(max(stds))
         self.xys.append(self.add_maxvar_point_xys[idx])
+
+    def remove_at_random(self):
+        e = randint(len(self.xys))
+        del self.xys[e]
+        self.tour.remove(e)
+        for i in range(0, len(self.tour)):
+            if self.tour[i] > e: self.tour[i] -= 1

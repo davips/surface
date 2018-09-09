@@ -67,11 +67,6 @@ for a in range(0, na):
     if plot:
         trip.plot()
 
-    # Remove city at random.
-    e = randint(len(trip.xys))
-    del trip.xys[e]
-    trip.tour.remove(e)
-    for i in range(0, len(trip.tour)):
-        if trip.tour[i] > e: trip.tour[i] -= 1
+    trip.remove_at_random()
 
 trip.xys = new_trip_xys2.copy()
