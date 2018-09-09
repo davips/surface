@@ -8,11 +8,10 @@ cd surface
 ```
 Copy gurobi folder (gurobi752 ?) to the current folder, if exact search is needed.
 
-# usage examples
+# usage example
 ```
-python -u ocean.py               # shows usage
-python -u ocean.py known=4x4 next=maxvar distortion=random search=heuri log=mini verbosity=less plot=fun f=2
-python -u ocean.py known=4x4 next=maxvar distortion=random search=heuri log=mini verbosity=less plot=path f=2
-python -u ocean.py known=4x4 next=maxvar distortion=pswarm search=heuri log=full verbosity=less plot=none f=2 2> /dev/null | grep out
+python -u new-ocean.py               # argument list stil in progress
 ```
-The program will output the total variance value, the total error, the number of probings and the name of the kernel selected by k-fold CV. The plot of the path or the surface of functions can be requested at the command line.
+The program will output the total variance value, the total error among other values in function of the time.
+The kernel is selected by k-fold CV.
+The plot of the path or the surface of functions can be requested at the command line.

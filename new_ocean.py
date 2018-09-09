@@ -44,8 +44,9 @@ for a in range(0, na):
             if failures > max_failures: break
             trip.xys = new_trip_xys.copy()
 
-    trip.xys = new_trip_xys.copy()
-    trip.calculate_tour()
+    if trip.xys != new_trip_xys:
+        trip.xys = new_trip_xys.copy()
+        trip.calculate_tour()
 
     print("out: Inducing with simulated data...")
     trip_var = sum(trip.stds_simulated(TSxy))
