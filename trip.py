@@ -10,7 +10,7 @@
 #
 #     You should have received a copy of the GNU Lesser General Public License
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from sklearn.gaussian_process.kernels import Matern
+from sklearn.gaussian_process.kernels import Matern, RationalQuadratic, WhiteKernel
 from numpy.random import uniform, randint
 from plotter import Plotter
 from aux import kernel_selector, plan_tour, current_milli_time
@@ -30,7 +30,7 @@ class Trip:
         self.depot = depot
         self.first_xys = first_xys
         self.first_zs = first_zs
-        self.kernel = Matern(length_scale_bounds=(0.000001, 100000), nu=1.6)
+        self.kernel = RationalQuadratic(length_scale_bounds=(0.08, 100)) + WhiteKernel(noise_level_bounds=(1e-5, 1e-2)) #  Matern(length_scale_bounds=(0.000001, 100000), nu=1.6)
         self.xys, self.zs, self.tour = [], [], []
         self.plotter = plotter
         self.budget = budget

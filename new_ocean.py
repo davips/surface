@@ -16,9 +16,9 @@ trip_var_min = 9999999
 
 print('out: Adding points while feasible...')
 # trip.plotvar = True
-# trip.set_add_maxvar_point_xys(TSxy)
-# trip.try_while_possible(trip.add_maxvar_point)
-trip.try_while_possible(trip.add_random_point)
+trip.set_add_maxvar_point_xys(TSxy)
+trip.try_while_possible(trip.add_maxvar_point)
+# trip.try_while_possible(trip.add_random_point)
 
 start = current_milli_time()
 for a in range(0, na):
