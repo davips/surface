@@ -51,9 +51,6 @@ class Trip:
         self.model.fit(self.first_xys, self.first_zs)
         self.model_time += current_milli_time() - start
 
-    def add_random_point(self):
-        self.xys.append((uniform(), uniform()))
-
     def calculate_tour(self):
         start = current_milli_time()
         self.tour, self.feasible, self.cost = plan_tour([self.depot] + self.xys, self.budget, exact=True)
@@ -133,6 +130,9 @@ class Trip:
         idx = stds.index(max(stds))
         self.xys.append(self.add_maxvar_point_xys[idx])
 
+    def add_random_point(self):
+        self.xys.append((uniform(), uniform()))
+
     def remove_at_random(self):
         idx = randint(len(self.xys))
         del self.xys[idx]
@@ -145,3 +145,6 @@ class Trip:
 
     def plot_var(self):
         if self.plotter is not None: self.plotter.surface(lambda x, y: self.model.predict([(x, y)], return_std=True)[1][0], 30, 0, 1)
+
+    def plot_pred(self):
+        if self.plotter is not None: self.plotter.surface(lambda x, y: self.model.predict([(x, y)])[0], 30, 0, 50)

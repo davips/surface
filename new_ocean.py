@@ -6,7 +6,7 @@ from plotter import Plotter
 from trip import *
 
 seed(int(argv[2]))
-plot, budget, na, nb, side, f = argv[1] == 'p', 100, int(argv[3]), int(argv[4]), int(argv[5]), f5
+plot, budget, na, nb, side, f = argv[1] == 'p', int(argv[6]), int(argv[3]), int(argv[4]), int(argv[5]), f5
 (first_xys, first_zs), (TSxy, TSz), depot, max_failures = train_data(side, f, False), test_data(f), (-0.0000001, -0.0000001), math.ceil(nb / 5)
 plotter = Plotter('surface') if plot else None
 trip = Trip(depot, first_xys, first_zs, budget, plotter)
@@ -41,7 +41,6 @@ for a in range(0, na):
             trip.store3()
         else:
             failures += 1
-            # print(failures)
             if failures > max_failures: break
             trip.restore3()
     trip.restore3()
@@ -57,9 +56,10 @@ for a in range(0, na):
     # Logging.
     print("out: Inducing with real data to evaluate error...")
     # trip3 = Trip(depot, first_xys + trip.xys, first_zs + probe(f, trip.xys), budget, plotter)
-    # trip3.select_kernel() # TODO descomentar na versão final? e ver se precisa tirar kernel abaixo
+    # # trip3.select_kernel() # TODO descomentar na versão final? e ver se precisa tirar kernel abaixo
     # trip3.fit()
-    error = 0 #evalu_sum(trip3.model, TSxy, TSz)
+    # # trip3.plot_pred()
+    error = 0  # evalu_sum(trip3.model, TSxy, TSz)
     print(current_milli_time() - start, trip_var, trip_var_min, error, trip.model_time, trip.pred_time, trip.tour_time, sep='\t')
 
     # Plotting.
