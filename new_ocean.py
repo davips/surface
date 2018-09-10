@@ -7,17 +7,18 @@ from trip import *
 
 seed(int(argv[2]))
 plot, budget, na, nb, side, f = argv[1] == 'p', 100, int(argv[3]), int(argv[4]), int(argv[5]), f5
-(first_xys, first_zs), (TSxy, TSz), depot, max_failures = train_data(side, f, False), test_data(f), (-0.0000001, -0.0000001), nb / 5
+(first_xys, first_zs), (TSxy, TSz), depot, max_failures = train_data(side, f, False), test_data(f), (-0.0000001, -0.0000001), math.ceil(nb / 5)
 plotter = Plotter('surface') if plot else None
 trip = Trip(depot, first_xys, first_zs, budget, plotter)
 trip.select_kernel()  # TOD
 trip.fit()
 trip_var_min = 9999999
 
-print('out: Adding random...')
-trip.set_add_maxvar_point_xys(TSxy)
-trip.try_while_possible(trip.add_maxvar_point)
-# trip.try_while_possible(trip.add_random_point)
+print('out: Adding points while feasible...')
+# trip.plotvar = True
+# trip.set_add_maxvar_point_xys(TSxy)
+# trip.try_while_possible(trip.add_maxvar_point)
+trip.try_while_possible(trip.add_random_point)
 
 start = current_milli_time()
 for a in range(0, na):
