@@ -28,7 +28,7 @@ for a in range(0, na):
     # Distort one city at a time.
     print('out: Distorting...')
     trip_var_max = evalu_var(trip, trip.xys)
-    new_trip_xys = trip.xys.copy()
+    trip.store3()
     failures = 0
     for b in range(0, nb):
         distort1(trip.depot, trip.xys, trip.tour, random_distortion)
@@ -37,37 +37,34 @@ for a in range(0, na):
         if trip.feasible and trip_var > trip_var_max:
             failures = 0
             trip_var_max = trip_var
-            new_trip_xys = trip.xys.copy()
+            trip.store3()
         else:
             failures += 1
             # print(failures)
             if failures > max_failures: break
-            trip.xys = new_trip_xys.copy()
-
-    if trip.xys != new_trip_xys:
-        trip.xys = new_trip_xys.copy()
-        trip.calculate_tour()
+            trip.restore3()
+    trip.restore3()
 
     print("out: Inducing with simulated data...")
     trip_var = sum(trip.stds_simulated(TSxy))
     if trip_var < trip_var_min:
         trip_var_min = trip_var
-        new_trip_xys2 = trip.xys.copy()
+        trip.store2()
     else:
-        trip.xys = new_trip_xys2.copy()
+        trip.restore2()
 
     # Logging.
     print("out: Inducing with real data to evaluate error...")
-    trip3 = Trip(depot, first_xys + trip.xys, first_zs + probe(f, trip.xys), budget, plotter)
-    trip3.select_kernel() # ODO descomentar na versão final e tirar kernel abaixo
-    trip3.fit()
-    error = evalu_sum(trip3.model, TSxy, TSz)
+    # trip3 = Trip(depot, first_xys + trip.xys, first_zs + probe(f, trip.xys), budget, plotter)
+    # trip3.select_kernel() # TODO descomentar na versão final? e ver se precisa tirar kernel abaixo
+    # trip3.fit()
+    error = 0 #evalu_sum(trip3.model, TSxy, TSz)
     print(current_milli_time() - start, trip_var, trip_var_min, error, trip.model_time, trip.pred_time, trip.tour_time, sep='\t')
 
     # Plotting.
     if plot:
-        trip.plot()
+        trip.plot_path()
 
     trip.remove_at_random()
 
-trip.xys = new_trip_xys2.copy()
+trip.restore2()

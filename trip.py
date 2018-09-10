@@ -37,9 +37,7 @@ class Trip:
         self.model_time = 0
         self.tour_time = 0
         self.pred_time = 0
-
-    def plot(self):
-        if self.plotter is not None: plotter.path([depot] + self.xys, tour)
+        self.plotvar = False
 
     def select_kernel(self):
         start = current_milli_time()
@@ -68,6 +66,22 @@ class Trip:
     def restore(self):
         self.xys = self.stored_trip_xys.copy()
         self.tour = self.stored_tour.copy()
+
+    def store2(self):
+        self.stored2_trip_xys = self.xys.copy()
+        self.stored2_tour = self.tour.copy()
+
+    def restore2(self):
+        self.xys = self.stored2_trip_xys.copy()
+        self.tour = self.stored2_tour.copy()
+
+    def store3(self):
+        self.stored3_trip_xys = self.xys.copy()
+        self.stored3_tour = self.tour.copy()
+
+    def restore3(self):
+        self.xys = self.stored3_trip_xys.copy()
+        self.tour = self.stored3_tour.copy()
 
     def try_while_possible(self, f):
         """Apply f() while the tour is feasible."""
@@ -103,11 +117,12 @@ class Trip:
 
     def stds_simulated(self, xys):
         zs = [] if len(self.xys) == 0 else self.predict(self.xys)
-        trip2 = Trip(self.depot, self.first_xys + self.xys, self.first_zs + list(zs), self.budget)
+        trip2 = Trip(self.depot, self.first_xys + self.xys, self.first_zs + list(zs), self.budget, self.plotter)
         trip2.fit(self.kernel)
         stds = trip2.predict_stds(xys)
         self.model_time += trip2.model_time
         self.pred_time += trip2.pred_time
+        if self.plotvar: trip2.plot_var()
         return stds
 
     def set_add_maxvar_point_xys(self, add_maxvar_point_xys):
@@ -119,8 +134,14 @@ class Trip:
         self.xys.append(self.add_maxvar_point_xys[idx])
 
     def remove_at_random(self):
-        e = randint(len(self.xys))
-        del self.xys[e]
-        self.tour.remove(e)
+        idx = randint(len(self.xys))
+        del self.xys[idx]
+        self.tour.remove(idx)
         for i in range(0, len(self.tour)):
-            if self.tour[i] > e: self.tour[i] -= 1
+            if self.tour[i] > idx: self.tour[i] -= 1
+
+    def plot_path(self):
+        if self.plotter is not None: self.plotter.path([self.depot] + self.xys, self.tour)
+
+    def plot_var(self):
+        if self.plotter is not None: self.plotter.surface(lambda x, y: self.model.predict([(x, y)], return_std=True)[1][0], 30, 0, 1)
