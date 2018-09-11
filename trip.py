@@ -39,9 +39,9 @@ class Trip:
         self.pred_time = 0
         self.plotvar = False
 
-    def select_kernel(self):
+    def select_kernel_and_fit(self):
         start = current_milli_time()
-        self.kernel = kernel_selector(self.first_xys, self.first_zs)
+        self.kernel, self.model = kernel_selector(self.first_xys, self.first_zs)
         self.model_time += current_milli_time() - start
 
     def fit(self, kernel=None):

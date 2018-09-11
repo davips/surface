@@ -43,13 +43,14 @@ def kernel_selector(xys, zs, seed=42):
     # find best kernel on k-fold CV
     min_error = 99999
     for kernel in kernels:
-        gpr = GaussianProcessRegressor(kernel=kernel + WhiteKernel(noise_level_bounds=(1e-5, 1e-2)), n_restarts_optimizer=10, copy_X_train=True, random_state=seed)
-        err = -1 * cross_val_score(gpr, xys, zs, scoring='neg_mean_absolute_error', cv=5).mean()
+        model = GaussianProcessRegressor(kernel=kernel + WhiteKernel(noise_level_bounds=(1e-5, 1e-2)), n_restarts_optimizer=10, copy_X_train=True, random_state=seed)
+        err = -1 * cross_val_score(model, xys, zs, scoring='neg_mean_absolute_error', cv=5).mean()
         # print((type(kernel).__name__[:12] + '\t:\t' + str(err)).expandtabs(13))
         if err < min_error:
             min_error = err
             min_error_kernel = kernel
-    return min_error_kernel
+            min_model = model
+    return min_error_kernel + WhiteKernel(noise_level_bounds=(1e-5, 1e-2)), min_model
 
 
 def train_data(l, f, rnd):
@@ -265,7 +266,9 @@ def median_distortion(a, b, c, d, e, f):
 
 def random_distortion(a, b, c, d, e, f):
     s = 0.01 * (dist(a, b, c, d) + dist(c, d, e, f)) / 2
-    return c + normal(scale=s), d + normal(scale=s)
+    x, y = c + normal(scale=s), d + normal(scale=s)
+    # print(c, d, x, y)
+    return x, y
 
 
 def current_milli_time():
