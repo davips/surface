@@ -23,14 +23,14 @@ seed(seedval)
 plotter = Plotter('surface') if plot else None
 trip = Trip(depot, first_xys, first_zs, budget, plotter)
 trip.select_kernel_and_fit()  # TOD
-# trip.fit()
+trip.fit()
 trip_var_min = 9999999
 
 print('out: Adding points while feasible...')
 # trip.plotvar = True
-# trip.set_add_maxvar_point_xys(TSxy)
-# trip.try_while_possible(trip.add_maxvar_point)
-trip.try_while_possible(trip.add_random_point)
+trip.set_add_maxvar_point_xys(TSxy)
+trip.try_while_possible(trip.add_maxvar_point)
+# trip.try_while_possible(trip.add_random_point)
 
 start = current_milli_time()
 for a in range(0, na):
@@ -73,11 +73,12 @@ for a in range(0, na):
 
     # Logging.
     print("out: Inducing with real data to evaluate error...")
-    trip3 = Trip(depot, first_xys + trip.xys, first_zs + probe(f, trip.xys), budget, plotter)
-    trip3.select_kernel_and_fit() # TOD descomentar na versao final?
-    # trip3.plot_pred()
-    error = evalu_sum(trip3.model, TSxy, TSz)
-    print(current_milli_time() - start, trip_var, trip_var_min, error, trip.model_time, trip.pred_time, trip.tour_time, trip3.kernel, sep='\t')
+    trip2 = Trip(depot, first_xys + trip.xys, first_zs + probe(f, trip.xys), budget, plotter)
+    trip2.select_kernel_and_fit() # TOD descomentar na versao final?
+    trip2.fit()
+    # trip2.plot_pred()
+    error = evalu_sum(trip2.model, TSxy, TSz)
+    print(current_milli_time() - start, trip_var, trip_var_min, error, trip.model_time, trip.pred_time, trip.tour_time, trip2.kernel, sep='\t')
 
     # Plotting.
     if plot:
