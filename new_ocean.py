@@ -84,6 +84,6 @@ for a in range(0, na):
     if plot:
         trip.plot_path()
 
-    if uniform() < 0.05:  trip.remove_at_random()
+    if uniform() < 0.20:  trip.remove_at_random()
 
 trip.restore2()
