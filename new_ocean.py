@@ -22,7 +22,7 @@ seed(seedval)
 (first_xys, first_zs), (TSxy, TSz), depot, max_failures = train_data(side, f, False), test_data(f), (-0.00001, -0.00001), math.ceil(nb / 5)
 plotter = Plotter('surface') if plot else None
 trip = Trip(depot, first_xys, first_zs, budget, plotter)
-trip.select_kernel_and_fit()  # TOD
+trip.select_kernel_and_model()  # TOD
 trip.fit()
 trip_var_min = 9999999
 
@@ -74,7 +74,8 @@ for a in range(0, na):
     # Logging.
     print("out: Inducing with real data to evaluate error...")
     trip2 = Trip(depot, first_xys + trip.xys, first_zs + probe(f, trip.xys), budget, plotter)
-    trip2.select_kernel_and_fit() # TOD descomentar na versao final?
+    # trip2.select_kernel_and_model()
+    trip2.kernel = trip.kernel
     trip2.fit()
     # trip2.plot_pred()
     error = evalu_sum(trip2.model, TSxy, TSz)
@@ -84,6 +85,6 @@ for a in range(0, na):
     if plot:
         trip.plot_path()
 
-    if uniform() < 0.20:  trip.remove_at_random()
+    if uniform() < 0.05:  trip.remove_at_random()
 
 trip.restore2()

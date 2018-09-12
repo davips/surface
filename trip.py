@@ -30,7 +30,10 @@ class Trip:
         self.depot = depot
         self.first_xys = first_xys
         self.first_zs = first_zs
-        self.kernel = RationalQuadratic(length_scale_bounds=(0.08, 100)) + WhiteKernel(noise_level_bounds=(1e-5, 1e-2)) #  Matern(length_scale_bounds=(0.000001, 100000), nu=1.6)
+        # self.kernel = Matern(length_scale_bounds=(0.000001, 100000), nu=2.5)
+        # self.kernel = Matern(length_scale_bounds=(0.000001, 100000), nu=2.5) + WhiteKernel(noise_level_bounds=(1e-5, 1e-2))
+        # self.kernel = RationalQuadratic(length_scale_bounds=(0.08, 100)) + WhiteKernel(noise_level_bounds=(1e-5, 1e-2))
+        self.kernel = RationalQuadratic(length_scale_bounds=(0.08, 100))
         self.xys, self.zs, self.tour = [], [], []
         self.plotter = plotter
         self.budget = budget
@@ -39,7 +42,7 @@ class Trip:
         self.pred_time = 0
         self.plotvar = False
 
-    def select_kernel_and_fit(self):
+    def select_kernel_and_model(self):
         start = current_milli_time()
         self.kernel, self.model = kernel_selector(self.first_xys, self.first_zs)
         self.model_time += current_milli_time() - start
