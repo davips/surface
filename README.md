@@ -10,7 +10,7 @@ Copy gurobi folder (gurobi752 ?) to the current folder, if exact search is neede
 
 # usage example
 ```
-python -u new-ocean.py               # argument list stil in progress
+python -u ocean.py               # argument list stil in progress
 ```
 The program will output the total variance value, the total error among other values in function of the time.
 The kernel is selected by k-fold CV.
