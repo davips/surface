@@ -24,6 +24,7 @@ class Trip:
     depot -- tuple indicating starting point of the upcoming trip
     first_xys -- list of points (tuples) already probed in previous trips
     first_zs -- list of measurements in previous trips
+    budget -- max allowed distance + number of points
     """
 
     def __init__(self, depot, first_xys, first_zs, budget, plotter=None):
@@ -117,6 +118,7 @@ class Trip:
         return preds
 
     def stds_simulated(self, xys):
+        """Simulate probings using predicted values, induces a model and return std deviations."""
         zs = [] if len(self.xys) == 0 else self.predict(self.xys)
         trip2 = Trip(self.depot, self.first_xys + self.xys, self.first_zs + list(zs), self.budget, self.plotter)
         trip2.fit(self.kernel)
@@ -126,13 +128,15 @@ class Trip:
         if self.plotvar: trip2.plot_var()
         return stds
 
-    def set_add_maxvar_point_xys(self, add_maxvar_point_xys):
-        self.add_maxvar_point_xys = add_maxvar_point_xys
+    def add_maxvar_point(self, xys):
+        """Intended to act as a partial function application. Return a function that appends a point to the trip."""
 
-    def add_maxvar_point(self):
-        stds = list(self.stds_simulated(self.add_maxvar_point_xys))
-        idx = stds.index(max(stds))
-        self.xys.append(self.add_maxvar_point_xys[idx])
+        def f():
+            stds = list(self.stds_simulated(xys))
+            idx = stds.index(max(stds))
+            self.xys.append(xys[idx])
+
+        return f
 
     def add_random_point(self):
         self.xys.append((uniform(), uniform()))
