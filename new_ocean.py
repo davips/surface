@@ -12,10 +12,10 @@
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from sys import argv
 from aux import train_data, test_data, evalu_var, evalu_sum, probe, distort1, random_distortion, current_milli_time
-from numpy.random import seed, randint
+from numpy.random import seed, randint, uniform
 from functions import *
 from plotter import Plotter
-from trip import *
+from trip import Trip
 
 plot, seedval, na, nb, side, budget, f = argv[1] == 'p', int(argv[2]), int(argv[3]), int(argv[4]), int(argv[5]), int(argv[6]), f5
 seed(seedval)
@@ -40,7 +40,7 @@ for a in range(0, na):
 
     # Distort one city at a time.
     print('out: Distorting one city at a time...')
-    trip_var_max = sum(trip.stds_simulated(TSxy))
+    trip_var_min_internal_loop = sum(trip.stds_simulated(TSxy))
     #trip_var_max = evalu_var(trip, trip.xys)
     trip.store3()
     failures = 0
@@ -50,11 +50,11 @@ for a in range(0, na):
         #if trip.feasible: trip_var = evalu_var(trip, trip.xys)
         if trip.feasible: trip_var = sum(trip.stds_simulated(TSxy))
         # print(trip_var, trip_var_max, trip.feasible)
-        if trip.feasible and trip_var < trip_var_max:
+        if trip.feasible and trip_var < trip_var_min_internal_loop:
         # if trip.feasible and trip_var > trip_var_max:
             failures = 0
             #print('ok')
-            trip_var_max = trip_var
+            trip_var_min_internal_loop = trip_var
             trip.store3()
             # trip.plot_path()
         else:
@@ -85,6 +85,6 @@ for a in range(0, na):
     if plot:
         trip.plot_path()
 
-    if uniform() < 0.05:  trip.remove_at_random()
+    if uniform() < 0.20:  trip.remove_at_random()
 
 trip.restore2()
