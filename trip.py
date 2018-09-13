@@ -129,7 +129,7 @@ class Trip:
         return stds
 
     def add_maxvar_point(self, xys):
-        """Intended to act as a partial function application. Return a function that appends a point to the trip."""
+        """Intended to act as a partial function application. Return a function that appends the maxvar point (in xys) to the trip."""
 
         def f():
             stds = list(self.stds_simulated(xys))
