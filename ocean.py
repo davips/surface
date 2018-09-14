@@ -16,6 +16,7 @@ from numpy.random import seed, randint, uniform
 from functions import *
 from plotter import Plotter
 from trip import Trip
+from swarm import swarm_distortion
 
 plot, seedval, na, nb, side, budget, f = argv[1] == 'p', int(argv[2]), int(argv[3]), int(argv[4]), int(argv[5]), int(argv[6]), f5
 seed(seedval)
@@ -37,30 +38,31 @@ for a in range(0, na):
     print('out: Adding neighbors...')
     trip.try_while_possible(trip.middle_insertion)
 
-    # Distort one city at a time.
-    print('out: Distorting one city at a time...')
-    trip_var_min_internal_loop = sum(trip.stds_simulated(TSxy))
-    #trip_var_max = evalu_var(trip, trip.xys)
-    trip.store3()
-    failures = 0
-    for b in range(0, nb):
-        distort1(trip.depot, trip.xys, trip.tour, random_distortion)
-        trip.calculate_tour()
-        #if trip.feasible: trip_var = evalu_var(trip, trip.xys)
-        if trip.feasible: trip_var = sum(trip.stds_simulated(TSxy))
-        # print(trip_var, trip_var_max, trip.feasible)
-        if trip.feasible and trip_var < trip_var_min_internal_loop:
-        # if trip.feasible and trip_var > trip_var_max:
-            failures = 0
-            #print('ok')
-            trip_var_min_internal_loop = trip_var
-            trip.store3()
-            # trip.plot_path()
-        else:
-            failures += 1
-            if failures > max_failures: break
-            trip.restore3()
-    trip.restore3()
+    swarm_distortion(trip, TSxy, f)
+    # # Distort one city at a time.
+    # print('out: Distorting one city at a time...')
+    # trip_var_min_internal_loop = sum(trip.stds_simulated(TSxy))
+    # #trip_var_max = evalu_var(trip, trip.xys)
+    # trip.store3()
+    # failures = 0
+    # for b in range(0, nb):
+    #     distort1(trip.depot, trip.xys, trip.tour, random_distortion)
+    #     trip.calculate_tour()
+    #     #if trip.feasible: trip_var = evalu_var(trip, trip.xys)
+    #     if trip.feasible: trip_var = sum(trip.stds_simulated(TSxy))
+    #     # print(trip_var, trip_var_max, trip.feasible)
+    #     if trip.feasible and trip_var < trip_var_min_internal_loop:
+    #     # if trip.feasible and trip_var > trip_var_max:
+    #         failures = 0
+    #         #print('ok')
+    #         trip_var_min_internal_loop = trip_var
+    #         trip.store3()
+    #         # trip.plot_path()
+    #     else:
+    #         failures += 1
+    #         if failures > max_failures: break
+    #         trip.restore3()
+    # trip.restore3()
 
     print("out: Inducing with simulated data...")
     trip_var = sum(trip.stds_simulated(TSxy))
@@ -78,7 +80,7 @@ for a in range(0, na):
     trip2.fit()
     # trip2.plot_pred()
     error = evalu_sum(trip2.model, TSxy, TSz)
-    print(current_milli_time() - start, trip_var, trip_var_min, error, trip.model_time, trip.pred_time, trip.tour_time, trip2.kernel, sep='\t')
+    print('res:', current_milli_time() - start, trip_var, trip_var_min, error, trip.model_time, trip.pred_time, trip.tour_time, trip2.kernel.replace(' ', '_'), sep='\t')
 
     # Plotting.
     if plot:

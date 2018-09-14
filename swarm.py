@@ -12,29 +12,28 @@
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from pswarm_py import pswarm
-from numpy import zeros
-from numpy import ones
-from aux import *
+from numpy import zeros, ones
+from aux import tuplefy, probe, flat
+from trip import Trip
 
 
-def swarm_distortion(trip):
+def swarm_distortion(trip, TSxy, f):
     def py_outf(it, leader, fx, x):
-        # trip.refit2(tuplefy(x))
-        # if trip.isfeasible():
-        #     return 1.0  # negative number = stop
-        # else:
-        return 1.0
+        return 1.0  # negative number = stop
 
     def py_objf(xs):
         def var(x):
-            trip.refit2(tuplefy(x))  # according to my tests with trip.count(), trip methods don't need to be thread-safe here
-            v = trip.getvar()
-            # trip.count()
-            return v + 10 * (trip.cost - trip.last_budget) if trip.penalize() else v  # penalize() might update cost
+            xys = tuplefy(x)  # according to my tests with oldtrip.count(), trip methods don't need to be thread-safe here
+            trip2 = Trip(trip.depot, trip.first_xys + xys, trip.first_zs + probe(f, xys), trip.budget)
+            trip2.kernel = trip.kernel
+            trip2.fit()
+            trip2.calculate_tour()
+            v = sum(trip2.stds_simulated(TSxy)) + (0 if trip2.feasible else 10000 * (trip2.cost - trip2.budget))
+            return v
 
         return [var(x) for x in xs]
 
-    x0 = flat(trip.future_xys)
+    x0 = flat(trip.xys)
     variabs = len(x0)
     problem = {'Variables': variabs, 'objf': py_objf, 'lb': zeros(variabs), 'ub': ones(variabs), 'x0': x0}
     # , 'A': [[-1.0 / sqrt(3), 1], [-1.0, sqrt(3)], [1.0, sqrt(3)]], 'b': [0, 0, 6]
@@ -43,4 +42,5 @@ def swarm_distortion(trip):
         , 'outputfcn': py_outf, 'vectorized': 1}
     result = pswarm(problem, options)
     if result['ret'] == 0:  # zero means successful
-        trip.refit2(tuplefy(result['x']))
+        new_xys = tuplefy(result['x'])
+        trip.xys = new_xys.copy()
