@@ -17,19 +17,14 @@ from aux import tuplefy, probe, flat
 from trip import Trip
 
 
-def swarm_distortion(trip, TSxy, f):
+def swarm_distortion(trip, testset_xy):
     def py_outf(it, leader, fx, x):
         return 1.0  # negative number = stop
 
     def py_objf(xs):
         def var(x):
             xys = tuplefy(x)  # according to my tests with oldtrip.count(), trip methods don't need to be thread-safe here
-            trip2 = Trip(trip.depot, trip.first_xys + xys, trip.first_zs + probe(f, xys), trip.budget)
-            trip2.kernel = trip.kernel
-            trip2.fit()
-            trip2.calculate_tour()
-            v = sum(trip2.stds_simulated(TSxy)) + (0 if trip2.feasible else 10000 * (trip2.cost - trip2.budget))
-            return v
+            return trip.fitness(xys, testset_xy)
 
         return [var(x) for x in xs]
 

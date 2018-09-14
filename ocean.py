@@ -38,7 +38,7 @@ for a in range(0, na):
     print('out: Adding neighbors...')
     trip.try_while_possible(trip.middle_insertion)
 
-    swarm_distortion(trip, TSxy, f)
+    swarm_distortion(trip, TSxy)
     # # Distort one city at a time.
     # print('out: Distorting one city at a time...')
     # trip_var_min_internal_loop = sum(trip.stds_simulated(TSxy))
@@ -80,7 +80,7 @@ for a in range(0, na):
     trip2.fit()
     # trip2.plot_pred()
     error = evalu_sum(trip2.model, TSxy, TSz)
-    print('res:', current_milli_time() - start, trip_var, trip_var_min, error, trip.model_time, trip.pred_time, trip.tour_time, trip2.kernel.replace(' ', '_'), sep='\t')
+    print('res:', current_milli_time() - start, trip_var, trip_var_min, error, trip.model_time, trip.pred_time, trip.tour_time, str(trip2.kernel).replace(' ', '_'), sep='\t')
 
     # Plotting.
     if plot:

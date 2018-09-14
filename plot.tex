@@ -1,0 +1,19 @@
+\documentclass[tikz,border=1pt]{standalone}
+
+\usepackage{tikz,pgfplots}
+
+\begin{document}
+\begin{tikzpicture}
+\begin{axis}[xlabel=time, ]
+    \addplot [scatter] table [x={time}, y={variance}] {results.log0}; \addlegendentry{swarm}
+\end{axis}
+\end{tikzpicture}
+
+\end{document}
+
+% \addplot[densely dashdotted, very thick, blue, mark=*,   mark phase=150, mark options={solid, scale=1}, mark repeat=200] table[x=budget, y=Mar-RFw ] {kappaallmediaParesRank.tex}; \addlegendentry{Mar}
+% \addplot+[loosely dotted, very thick, black, mark=star,   mark phase=135, mark options={solid, scale=1.4}, mark repeat=200] table[x=budget, y=SGmulti-RFw] {kappaallmediaParesRank.tex};\addlegendentry{SGmulti}
+% \addplot+[solid, very thick, red, mark=square,   mark phase=165, mark options={solid, scale=1.4}, mark repeat=200] table[x=budget, y=EERent-RFw] {kappaallmediaParesRank.tex};\addlegendentry{ERE}
+% \addplot[dashed, very thick, violet, mark=10-pointed star,   mark phase=150, mark options={solid, scale=1.4, thin}, mark repeat=200] table[x=budget, y=EERacc-RFw ] {kappaallmediaParesRank.tex};\addlegendentry{OER}
+% \addplot+[densely dotted, very thick, teal, mark=triangle,   mark phase=150, mark options={solid, scale=1.4}, mark repeat=200] table[x=budget, y=Clu-RFw] {kappaallmediaParesRank.tex};\addlegendentry{HS}
+%
