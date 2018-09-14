@@ -13,7 +13,7 @@
 from sklearn.gaussian_process.kernels import Matern, RationalQuadratic, WhiteKernel
 from numpy.random import uniform, randint
 from plotter import Plotter
-from aux import kernel_selector, plan_tour, current_milli_time
+from aux import kernel_selector, plan_tour, current_milli_time, no_distortion
 from sklearn.gaussian_process import GaussianProcessRegressor
 
 
@@ -166,3 +166,18 @@ class Trip:
         trip.fit()
         trip.calculate_tour()
         return sum(trip.stds_simulated(TSxy)) + (0 if trip.feasible else 10000 * (trip.cost - trip.budget))
+
+    def distort(self, distortion_function):
+        """Apply a custom distortion function to all points, except depot and last."""
+        points = [self.depot] + self.xys
+        for ida, idb, idc in zip(self.tour, self.tour[1:], self.tour[2:]):
+            (a, b), (c, d), (e, f) = points[ida], points[idb], points[idc]
+            self.xys[idb - 1] = distortion_function(a, b, c, d, e, f)
+
+    def distort1(self, distortion_function):
+        """Apply a custom distortion function to one random point between depot and last."""
+        points = [self.depot] + self.xys
+        ttt = list(zip(self.tour, self.tour[1:], self.tour[2:]))
+        ida, idb, idc = ttt[randint(len(ttt) - 2)]
+        (a, b), (c, d), (e, f) = points[ida], points[idb], points[idc]
+        self.xys[idb - 1] = distortion_function(a, b, c, d, e, f)

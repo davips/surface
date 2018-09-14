@@ -236,23 +236,6 @@ def log(str):
     print('out:\t' + str)
 
 
-def distort(depot, trip_xys, tour, distortion_function):
-    """Apply a custom distortion function to all points, except depot and last."""
-    points = [depot] + trip_xys
-    for ida, idb, idc in zip(tour, tour[1:], tour[2:]):
-        (a, b), (c, d), (e, f) = points[ida], points[idb], points[idc]
-        trip_xys[idb - 1] = distortion_function(a, b, c, d, e, f)
-
-
-def distort1(depot, trip_xys, tour, distortion_function):
-    """Apply a custom distortion function to one random point between depot and last."""
-    points = [depot] + trip_xys
-    ttt = list(zip(tour, tour[1:], tour[2:]))
-    ida, idb, idc = ttt[randint(len(ttt) - 2)]
-    (a, b), (c, d), (e, f) = points[ida], points[idb], points[idc]
-    trip_xys[idb - 1] = distortion_function(a, b, c, d, e, f)
-
-
 def no_distortion(a, b, c, d, e, f):
     return c, d
 
