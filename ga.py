@@ -32,17 +32,18 @@ def select_fittest(distr):
 
 
 def crossover(a, b):
+    """Sibling is an average of parents."""
     c = []
     for i in range(0, len(a)):
         c.append(((a[i][0] + b[i][0]) / 2, (a[i][1] + b[i][1]) / 2))
     return c
 
 
-def ga_distortion(trip):
+def ga_distortion(trip, testset_xy):
     # Generate initial population.
     new_probings = []
     for i in range(0, popsize):
-        new_probings.append(trip.future_xys.copy())
+        new_probings.append(trip.xys.copy())
 
     for it in range(0, iters):
         probings = new_probings.copy()
@@ -50,9 +51,7 @@ def ga_distortion(trip):
         # Mutate population and calculate fitness information.
         fit = []
         for i in range(0, popsize):
-            trip.refit2(probings[i])
-            trip.distort(random_distortion)
-            fit.append(trip.getvar() + (10 * (trip.cost - trip.last_budget) if trip.penalize() else 0))
+            fit.append(trip.fitness(probings[i], testset_xy, random_distortion))
 
         # Define a probability distribution to select the fittest ones.
         minfit = min(fit)
@@ -79,9 +78,8 @@ def ga_distortion(trip):
     # Adopt best individual.
     vmin = 999999
     for i in range(0, popsize):
-        trip.refit2(probings[i])
-        v = trip.getvar() + (10 * (trip.cost - trip.last_budget) if trip.penalize() else 0)  # penalize() updates cost
+        v = trip.fitness(probings[i], testset_xy)
         if v < vmin:
             best = i
             vmin = v
-    trip.refit2(probings[best])
+    trip.xys = probings[best].copy()

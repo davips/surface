@@ -157,11 +157,12 @@ class Trip:
     def plot_pred(self):
         if self.plotter is not None: self.plotter.surface(lambda x, y: self.model.predict([(x, y)])[0], 30, 0, 50)
 
-    def fitness(self, xys, TSxy):
+    def fitness(self, xys, TSxy, distortf=no_distortion):
         """Return "total" variance of a given solution xys for a given test set."""
-        trip2 = Trip(self.depot, self.first_xys, self.first_zs, self.budget)
-        trip2.xys = xys.copy()
-        trip2.kernel = self.kernel
-        trip2.fit()
-        trip2.calculate_tour()
-        return sum(trip2.stds_simulated(TSxy)) + (0 if trip2.feasible else 10000 * (trip2.cost - trip2.budget))
+        trip = Trip(self.depot, self.first_xys, self.first_zs, self.budget)
+        trip.xys = xys.copy()
+        trip.distort(distortf)
+        trip.kernel = self.kernel
+        trip.fit()
+        trip.calculate_tour()
+        return sum(trip.stds_simulated(TSxy)) + (0 if trip.feasible else 10000 * (trip.cost - trip.budget))
