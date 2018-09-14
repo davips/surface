@@ -13,7 +13,7 @@
 from sklearn.gaussian_process.kernels import Matern, RationalQuadratic, WhiteKernel
 from numpy.random import uniform, randint
 from plotter import Plotter
-from aux import kernel_selector, plan_tour, current_milli_time, no_distortion
+from aux import kernel_selector, plan_tour, current_milli_time, no_distortion, random_distortion
 from sklearn.gaussian_process import GaussianProcessRegressor
 
 
@@ -161,11 +161,13 @@ class Trip:
         """Return "total" variance of a given solution xys for a given test set."""
         trip = Trip(self.depot, self.first_xys, self.first_zs, self.budget)
         trip.xys = xys.copy()
-        trip.distort(distortf)
+        if distortf != no_distortion:
+            trip.tour = self.tour.copy() # Copy tour just to be able to call distort().
+            trip.distort(distortf)
         trip.kernel = self.kernel
         trip.fit()
         trip.calculate_tour()
-        return sum(trip.stds_simulated(TSxy)) + (0 if trip.feasible else 10000 * (trip.cost - trip.budget))
+        return sum(trip.stds_simulated(TSxy)) + (0 if trip.feasible else 10000 * (trip.cost - trip.budget)), trip.xys
 
     def distort(self, distortion_function):
         """Apply a custom distortion function to all points, except depot and last."""

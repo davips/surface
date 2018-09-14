@@ -51,7 +51,8 @@ def ga_distortion(trip, testset_xy):
         # Mutate population and calculate fitness information.
         fit = []
         for i in range(0, popsize):
-            fit.append(trip.fitness(probings[i], testset_xy, random_distortion))
+            v, probings[i] = trip.fitness(probings[i], testset_xy, random_distortion)
+            fit.append(v)
 
         # Define a probability distribution to select the fittest ones.
         minfit = min(fit)

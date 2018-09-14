@@ -255,7 +255,6 @@ def random_distortion(a, b, c, d, e, f):
     if y > 1: y = 1
     if x < 0: x = 0
     if y < 0: y = 0
-    # print(c, d, x, y)
     return x, y
 
 
