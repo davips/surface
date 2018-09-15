@@ -79,7 +79,7 @@ def ga_distortion(trip, testset_xy):
     # Adopt best individual.
     vmin = 999999
     for i in range(0, popsize):
-        v = trip.fitness(probings[i], testset_xy)
+        v, _ = trip.fitness(probings[i], testset_xy)
         if v < vmin:
             best = i
             vmin = v

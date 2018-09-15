@@ -38,8 +38,8 @@ for a in range(0, na):
     print('out: Adding neighbors...')
     trip.try_while_possible(trip.middle_insertion)
 
-    ga_distortion(trip, TSxy)
-    # swarm_distortion(trip, TSxy)
+    # ga_distortion(trip, TSxy)
+    swarm_distortion(trip, TSxy)
     # # Distort one city at a time.
     # print('out: Distorting one city at a time...')
     # trip_var_min_internal_loop = sum(trip.stds_simulated(TSxy))

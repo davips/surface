@@ -24,7 +24,8 @@ def swarm_distortion(trip, testset_xy):
     def py_objf(xs):
         def var(x):
             xys = tuplefy(x)  # according to my tests with oldtrip.count(), trip methods don't need to be thread-safe here
-            return trip.fitness(xys, testset_xy)
+            v, _ = trip.fitness(xys, testset_xy)
+            return v
 
         return [var(x) for x in xs]
 

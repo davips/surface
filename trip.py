@@ -167,7 +167,11 @@ class Trip:
         trip.kernel = self.kernel
         trip.fit()
         trip.calculate_tour()
-        return sum(trip.stds_simulated(TSxy)) + (0 if trip.feasible else 10000 * (trip.cost - trip.budget)), trip.xys
+        v = sum(trip.stds_simulated(TSxy)) + (0 if trip.feasible else 10000 * (trip.cost - trip.budget)), trip.xys
+        self.tour_time += trip.tour_time
+        self.pred_time += trip.pred_time
+        self.model_time += trip.model_time
+        return v
 
     def distort(self, distortion_function):
         """Apply a custom distortion function to all points, except depot and last."""
