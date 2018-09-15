@@ -62,27 +62,27 @@ class Trip:
         self.tour_time += current_milli_time() - start
 
     def store(self):
-        self.stored_trip_xys = self.xys.copy()
+        self.stored_xys = self.xys.copy()
         self.stored_tour = self.tour.copy()
 
     def restore(self):
-        self.xys = self.stored_trip_xys.copy()
+        self.xys = self.stored_xys.copy()
         self.tour = self.stored_tour.copy()
 
     def store2(self):
-        self.stored2_trip_xys = self.xys.copy()
+        self.stored2_xys = self.xys.copy()
         self.stored2_tour = self.tour.copy()
 
     def restore2(self):
-        self.xys = self.stored2_trip_xys.copy()
+        self.xys = self.stored2_xys.copy()
         self.tour = self.stored2_tour.copy()
 
     def store3(self):
-        self.stored3_trip_xys = self.xys.copy()
+        self.stored3_xys = self.xys.copy()
         self.stored3_tour = self.tour.copy()
 
     def restore3(self):
-        self.xys = self.stored3_trip_xys.copy()
+        self.xys = self.stored3_xys.copy()
         self.tour = self.stored3_tour.copy()
 
     def try_while_possible(self, f):
@@ -120,12 +120,12 @@ class Trip:
     def stds_simulated(self, xys):
         """Simulate probings using predicted values, induces a model and return std deviations."""
         zs = [] if len(self.xys) == 0 else self.predict(self.xys)
-        trip2 = Trip(self.depot, self.first_xys + self.xys, self.first_zs + list(zs), self.budget, self.plotter)
-        trip2.fit(self.kernel)
-        stds = trip2.predict_stds(xys)
-        self.model_time += trip2.model_time
-        self.pred_time += trip2.pred_time
-        if self.plotvar: trip2.plot_var()
+        trip = Trip(self.depot, self.first_xys + self.xys, self.first_zs + list(zs), self.budget, self.plotter)
+        trip.fit(self.kernel)
+        stds = trip.predict_stds(xys)
+        self.model_time += trip.model_time
+        self.pred_time += trip.pred_time
+        if self.plotvar: trip.plot_var()
         return stds
 
     def add_maxvar_point(self, xys):
