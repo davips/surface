@@ -1,11 +1,31 @@
 \documentclass[tikz,border=1pt]{standalone}
 
 \usepackage{tikz,pgfplots}
-
 \begin{document}
+\pgfplotsset{width=7cm,compat=1.3}
 \begin{tikzpicture}
-\begin{axis}[xlabel=time, ]
-    \addplot [scatter] table [x={time}, y={variance}] {results.log0}; \addlegendentry{swarm}
+\pgfplotsset{scale only axis}
+\begin{axis}[axis y line*=left, xlabel=time (h), ylabel=variance]
+    \addplot [no marks, blue, dashed, thick] table [x expr={\thisrowno{1}/3600000}, y index = {2}] {f5-0-4x4-100-ga-3000.log};
+    \label{g1}
+    \addplot [no marks, red] table [x expr={\thisrowno{1}/3600000}, y index = {3}] {f5-0-4x4-100-ga-3000.log};
+    \label{g2}
+
+    \addplot [mark phase=0, mark=square, mark repeat=5, mark options={solid}, blue, dashed, thick] table [x expr={\thisrowno{1}/3600000}, y index = {2}] {f5-0-4x4-100-swarm-3000.log};
+    \label{s1}
+    \addplot [mark=square, mark repeat=5, mark options={solid}, red] table [x expr={\thisrowno{1}/3600000}, y index = {3}] {f5-0-4x4-100-swarm-3000.log};
+    \label{s2}
+\end{axis}
+\begin{axis}[axis y line*=right, axis x line=none, ylabel=error, legend style={at={(0.5,1.05)},anchor=south}]
+    \addlegendimage{/pgfplots/refstyle=g1}\addlegendentry{GA variance}
+    \addlegendimage{/pgfplots/refstyle=g2}\addlegendentry{GA best variance}
+    \addplot [no marks, dotted, thick] table [x expr={\thisrowno{1}/3600000}, y index = {4}] {f5-0-4x4-100-ga-3000.log};
+    \addlegendentry{GA error}
+
+    \addlegendimage{/pgfplots/refstyle=s1}\addlegendentry{PSwarm variance}
+    \addlegendimage{/pgfplots/refstyle=s2}\addlegendentry{PSwarm best variance}
+    \addplot [mark=square, mark repeat=5, mark options={solid, black}, black, dotted, thick] table [x expr={\thisrowno{1}/3600000}, y index = {4}] {f5-0-4x4-100-swarm-3000.log};
+    \addlegendentry{PSwarm error}
 \end{axis}
 \end{tikzpicture}
 
