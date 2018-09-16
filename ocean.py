@@ -18,6 +18,7 @@ from plotter import Plotter
 from trip import Trip
 from swarm import swarm_distortion
 from ga import ga_distortion
+
 plot, seedval, na, nb, side, budget, f = argv[1] == 'p', int(argv[2]), int(argv[3]), int(argv[4]), int(argv[5]), int(argv[6]), f5
 seed(seedval)
 (first_xys, first_zs), (TSxy, TSz), depot, max_failures = train_data(side, f, False), test_data(f), (-0.00001, -0.00001), math.ceil(nb / 5)
@@ -33,37 +34,38 @@ trip.try_while_possible(trip.add_maxvar_point(TSxy))
 # trip.try_while_possible(trip.add_random_point)
 
 start = current_milli_time()
-for a in range(0, na):
+for a in range(0, na + 1):
     trip.tour_time, trip.model_time, trip.pred_time = 0, 0, 0
-    print('out: Adding neighbors...')
-    trip.try_while_possible(trip.middle_insertion)
+    if a > 0:
+        print('out: Adding neighbors...')
+        trip.try_while_possible(trip.middle_insertion)
 
-    # ga_distortion(trip, TSxy)
-    swarm_distortion(trip, TSxy)
-    # # Distort one city at a time.
-    # print('out: Distorting one city at a time...')
-    # trip_var_min_internal_loop = sum(trip.stds_simulated(TSxy))
-    # #trip_var_max = evalu_var(trip, trip.xys)
-    # trip.store3()
-    # failures = 0
-    # for b in range(0, nb):
-    #     trip.distort1(random_distortion)
-    #     trip.calculate_tour()
-    #     #if trip.feasible: trip_var = evalu_var(trip, trip.xys)
-    #     if trip.feasible: trip_var = sum(trip.stds_simulated(TSxy))
-    #     # print(trip_var, trip_var_max, trip.feasible)
-    #     if trip.feasible and trip_var < trip_var_min_internal_loop:
-    #     # if trip.feasible and trip_var > trip_var_max:
-    #         failures = 0
-    #         #print('ok')
-    #         trip_var_min_internal_loop = trip_var
-    #         trip.store3()
-    #         # trip.plot_path()
-    #     else:
-    #         failures += 1
-    #         if failures > max_failures: break
-    #         trip.restore3()
-    # trip.restore3()
+        # ga_distortion(trip, TSxy)
+        # swarm_distortion(trip, TSxy)
+        # Distort one city at a time.
+        print('out: Distorting one city at a time...')
+        trip_var_min_internal_loop = sum(trip.stds_simulated(TSxy))
+        # trip_var_max = evalu_var(trip, trip.xys)
+        trip.store3()
+        failures = 0
+        for b in range(0, nb):
+            trip.distort1(random_distortion)
+            trip.calculate_tour()
+            # if trip.feasible: trip_var = evalu_var(trip, trip.xys)
+            if trip.feasible: trip_var = sum(trip.stds_simulated(TSxy))
+            # print(trip_var, trip_var_max, trip.feasible)
+            if trip.feasible and trip_var < trip_var_min_internal_loop:
+                # if trip.feasible and trip_var > trip_var_max:
+                failures = 0
+                # print('ok')
+                trip_var_min_internal_loop = trip_var
+                trip.store3()
+                # trip.plot_path()
+            else:
+                failures += 1
+                if failures > max_failures: break
+                trip.restore3()
+        trip.restore3()
 
     print("out: Inducing with simulated data...")
     trip_var = sum(trip.stds_simulated(TSxy))

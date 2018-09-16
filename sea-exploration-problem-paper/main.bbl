@@ -1,0 +1,48 @@
+\begin{thebibliography}{8}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{{#1}}
+\providecommand{\urlprefix}{URL }
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{DOI~\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{DOI~\discretionary{}{}{}\begingroup
+  \urlstyle{rm}\Url}\fi
+\providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem[{Anagnostopoulos et~al(2017)Anagnostopoulos, Atassi, Becchetti,
+  Fazzone, and Silvestri}]{Anagnostopoulos2017}
+Anagnostopoulos A, Atassi R, Becchetti L, Fazzone A, Silvestri F (2017) Tour
+  recommendation for groups. Data Mining and Knowledge Discovery
+  31(5):1157--1188
+
+\bibitem[{Chekuri et~al(2012)Chekuri, Korula, and P{\'a}l}]{Chekuri2012}
+Chekuri C, Korula N, P{\'a}l M (2012) Improved algorithms for orienteering and
+  related problems. ACM Transactions on Algorithms (TALG) 8(3):23
+
+\bibitem[{Golden et~al(1981)Golden, Levy, and Dahl}]{golden1981gtsp}
+Golden B, Levy L, Dahl R (1981) Two generalizations of the traveling salesman
+  problem. Omega 9(4):439 -- 441
+
+\bibitem[{Krige(1951)}]{Krige1951}
+Krige DG (1951) A statistical approach to some basic mine valuation problems on
+  the witwatersrand. Journal of the Southern African Institute of Mining and
+  Metallurgy 52(6):119--139
+
+\bibitem[{Kubo et~al(2012)Kubo, Pedroso, Muramatsu, and
+  Rais}]{pedroso2012gurobi-book}
+Kubo M, Pedroso JP, Muramatsu M, Rais A (2012) Mathematical Optimization:
+  Solving Problems using Gurobi and Python. Kindaikagakusha, Tokyo, Japan
+
+\bibitem[{Lin and Kernighan(1973)}]{Lin1973}
+Lin S, Kernighan BW (1973) An effective heuristic algorithm for the
+  traveling-salesman problem. Operations research 21(2):498--516
+
+\bibitem[{Rasmussen and Williams(2005)}]{Rasmussen2005}
+Rasmussen CE, Williams CKI (2005) Gaussian Processes for Machine Learning
+  (Adaptive Computation and Machine Learning). The MIT Press
+
+\bibitem[{Yu et~al(2016)Yu, Schwager, and Rus}]{Yu2016}
+Yu J, Schwager M, Rus D (2016) Correlated orienteering problem and its
+  application to persistent monitoring tasks. IEEE Transactions on Robotics
+  32(5):1106--1118
+
+\end{thebibliography}
