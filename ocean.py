@@ -42,8 +42,8 @@ for a in range(0, na + 1):
         trip.try_while_possible(trip.middle_insertion)
 
         # ga_distortion(trip, TSxy)
-        swarm_distortion(trip, TSxy)
-        # onecity_distortion(trip, TSxy, nb, max_failures)
+        # swarm_distortion(trip, TSxy)
+        onecity_distortion(trip, TSxy, nb, max_failures)
 
     print("out: Inducing with simulated data...")
     trip_var = sum(trip.stds_simulated(TSxy))
