@@ -1,3 +1,5 @@
+from aux import random_distortion
+
 def onecity_distortion(trip, TSxy, nb, max_failures):
     """Distort one city at a time."""
     print('out: Distorting one city at a time...')
