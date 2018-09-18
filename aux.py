@@ -42,7 +42,8 @@ def kernel_selector(xys, zs):
 
     # find best kernel on k-fold CV
     min_error = 99999
-    for kernel in kernels:
+    for kernel0 in kernels:
+        kernel = kernel0  + WhiteKernel(noise_level_bounds=(1e-5, 1e-2))
         gpr = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10, copy_X_train=True)
         # model = GaussianProcessRegressor(kernel=kernel + WhiteKernel(noise_level_bounds=(1e-5, 1e-2)), n_restarts_optimizer=10, copy_X_train=True)
         err = -1 * cross_val_score(gpr, xys, zs, scoring='neg_mean_absolute_error', cv=5).mean()

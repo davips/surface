@@ -20,12 +20,12 @@ from swarm import swarm_distortion
 from ga import ga_distortion
 from onecity import onecity_distortion
 
-plot, seedval, na, nb, side, budget, f = argv[1] == 'p', int(argv[2]), int(argv[3]), int(argv[4]), int(argv[5]), int(argv[6]), f5
+plot, seedval, time_limit, nb, side, budget, f = argv[1] == 'p', int(argv[2]), int(argv[3]), int(argv[4]), int(argv[5]), int(argv[6]), f5
 seed(seedval)
 (first_xys, first_zs), (TSxy, TSz), depot, max_failures = train_data(side, f, False), test_data(f), (-0.00001, -0.00001), math.ceil(nb / 5)
 plotter = Plotter('surface') if plot else None
 trip = Trip(depot, first_xys, first_zs, budget, plotter)
-trip.select_kernel_and_model()  # TOD
+trip.select_kernel()  # TOD
 trip.fit()
 trip_var_min = 9999999
 
@@ -35,15 +35,8 @@ trip.try_while_possible(trip.add_maxvar_point(TSxy))
 # trip.try_while_possible(trip.add_random_point)
 
 start = current_milli_time()
-for a in range(0, na + 1):
+while current_milli_time() < start + time_limit * 3600000:
     trip.tour_time, trip.model_time, trip.pred_time = 0, 0, 0
-    if a > 0:
-        print('out: Adding neighbors...')
-        trip.try_while_possible(trip.middle_insertion)
-
-        # ga_distortion(trip, TSxy)
-        # swarm_distortion(trip, TSxy)
-        onecity_distortion(trip, TSxy, nb, max_failures)
 
     print("out: Inducing with simulated data...")
     trip_var = sum(trip.stds_simulated(TSxy))
@@ -68,5 +61,12 @@ for a in range(0, na + 1):
         trip.plot_path()
 
     if uniform() < 0.20:  trip.remove_at_random()
+
+    print('out: Adding neighbors...')
+    trip.try_while_possible(trip.middle_insertion)
+
+    # ga_distortion(trip, TSxy)
+    # swarm_distortion(trip, TSxy)
+    onecity_distortion(trip, TSxy, nb, max_failures)
 
 trip.restore2()

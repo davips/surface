@@ -42,8 +42,9 @@ class Trip:
         self.tour_time = 0
         self.pred_time = 0
         self.plotvar = False
+        self.plotpred = False
 
-    def select_kernel_and_model(self):
+    def select_kernel(self):
         start = current_milli_time()
         self.kernel = kernel_selector(self.first_xys, self.first_zs)
         self.model_time += current_milli_time() - start
@@ -126,6 +127,7 @@ class Trip:
         self.model_time += trip.model_time
         self.pred_time += trip.pred_time
         if self.plotvar: trip.plot_var()
+        if self.plotpred: trip.plot_pred()
         return stds
 
     def add_maxvar_point(self, xys):
