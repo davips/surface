@@ -34,9 +34,15 @@ print('out: Adding points while feasible...')
 trip.try_while_possible(trip.add_maxvar_point(TSxy))
 # trip.try_while_possible(trip.add_random_point)
 
-start = current_milli_time()
+start, first = current_milli_time(), True
 while current_milli_time() < start + time_limit * 3600000:
     trip.tour_time, trip.model_time, trip.pred_time = 0, 0, 0
+
+    if not first:
+        # ga_distortion(trip, TSxy)
+        # swarm_distortion(trip, TSxy)
+        onecity_distortion(trip, TSxy, nb, max_failures)
+    first = False
 
     print("out: Inducing with simulated data...")
     trip_var = sum(trip.stds_simulated(TSxy))
@@ -61,12 +67,6 @@ while current_milli_time() < start + time_limit * 3600000:
         trip.plot_path()
 
     if uniform() < 0.20:  trip.remove_at_random()
-
-    print('out: Adding neighbors...')
     trip.try_while_possible(trip.middle_insertion)
-
-    # ga_distortion(trip, TSxy)
-    # swarm_distortion(trip, TSxy)
-    onecity_distortion(trip, TSxy, nb, max_failures)
 
 trip.restore2()
