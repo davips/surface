@@ -18,9 +18,11 @@ from plotter import Plotter
 from trip import Trip
 from swarm import swarm_distortion
 from ga import ga_distortion
-from onecity import onecity_distortion
+from onecity import onecity_distortion2, onecity_distortion
 
-plot, seedval, time_limit, nb, side, budget, f = argv[1] == 'p', int(argv[2]), int(argv[3]), int(argv[4]), int(argv[5]), int(argv[6]), f5
+plot, seedval, time_limit, nb, side, budget, fnumber, alg = argv[1] == 'p', int(argv[2]), int(argv[3]), int(argv[4]), int(argv[5]), int(argv[6]), int(argv[7]), argv[8]
+switcher = {1: f1, 2: f2, 3: f3, 4: f4, 5: f5, 6: f6, 7: f7, 8: f8, 9: f9, 10: f10}
+f = switcher.get(fnumber)
 seed(seedval)
 (first_xys, first_zs), (TSxy, TSz), depot, max_failures = train_data(side, f, False), test_data(f), (-0.00001, -0.00001), math.ceil(nb / 5)
 plotter = Plotter('surface') if plot else None
@@ -39,9 +41,10 @@ while current_milli_time() < start + time_limit * 3600000:
     trip.tour_time, trip.model_time, trip.pred_time = 0, 0, 0
 
     if not first:
-        # ga_distortion(trip, TSxy)
-        # swarm_distortion(trip, TSxy)
-        onecity_distortion(trip, TSxy, nb, max_failures)
+        if alg == 'ga': ga_distortion(trip, TSxy)
+        if alg == 'sw': swarm_distortion(trip, TSxy)
+        if alg == '1c': onecity_distortion(trip, TSxy, nb, max_failures)
+        # onecity_distortion2(trip, TSxy, nb, max_failures)
     first = False
 
     print("out: Inducing with simulated data...")

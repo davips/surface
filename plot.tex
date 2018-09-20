@@ -6,39 +6,79 @@
 \begin{tikzpicture}
 \pgfplotsset{scale only axis}
 \begin{axis}[axis y line*=left, xlabel=time (h), ylabel=variance]
-    \addplot [no marks, red, dashed, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {2}] {f5-0-4x4-100-ga-3000.log};
-    \label{g1}
-    \addplot [no marks, red] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {3}] {f5-0-4x4-100-ga-3000.log};
-    \label{g2}
+%    \addplot [no marks, red, dashed, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {2}] {f5-0-4x4-100-ga-3000.log};
+%    \label{g1}
+%    \addplot [no marks, red] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {3}] {f5-0-4x4-100-ga-3000.log};
+%    \label{g2}
 
-    \addplot [no marks, blue, dashed, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {2}] {f5-0-4x4-100-swarm-20000.log};
+    \addplot [no marks, blue, dashed, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {2}] {f5-0-4x4-100-swarm-5000.log};
     \label{s1}
-    \addplot [mark=square, mark repeat=5, mark options={solid}, blue] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {3}] {f5-0-4x4-100-swarm-20000.log};
+    \addplot [mark=square, mark repeat=1, mark options={solid}, blue] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {3}] {f5-0-4x4-100-swarm-5000.log};
     \label{s2}
 
-    \addplot [no marks, black!30!green, dashed, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {2}] {f5-0-4x4-100-dist-3000.log};
+    \addplot [no marks, black!30!green, dashed, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {2}] {f5-0-4x4-100-dist-1000.log};
     \label{d1}
-    \addplot [mark=x, mark repeat=5, mark options={solid}, black!30!green] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {3}] {f5-0-4x4-100-dist-3000.log};
+    \addplot [mark=x, mark repeat=1, mark options={solid}, black!30!green] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {3}] {f5-0-4x4-100-dist-1000.log};
     \label{d2}
 \end{axis}
 \begin{axis}[axis y line*=right, axis x line=none, ylabel=error, legend style={at={(0.5,1.05)},anchor=south}]
 %    \addlegendimage{/pgfplots/refstyle=g1}\addlegendentry{GA variance}
-    \addlegendimage{/pgfplots/refstyle=g2}\addlegendentry{GA best variance}
-    \addplot [no marks, dotted, thick, red] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {4}] {f5-0-4x4-100-ga-3000.log};
-    \addlegendentry{GA error}
+%    \addlegendimage{/pgfplots/refstyle=g2}\addlegendentry{GA best variance}
+%    \addplot [no marks, dotted, thick, red] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {4}] {f5-0-4x4-100-ga-3000.log};
+%    \addlegendentry{GA error}
 
 %    \addlegendimage{/pgfplots/refstyle=s1}\addlegendentry{PSwarm variance}
     \addlegendimage{/pgfplots/refstyle=s2}\addlegendentry{PSwarm best variance}
-    \addplot [mark=square, mark repeat=5, mark options={solid}, blue, dotted, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {4}] {f5-0-4x4-100-swarm-20000.log};
+    \addplot [mark=square, mark repeat=1, mark options={solid}, blue, dotted, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {4}] {f5-0-4x4-100-swarm-5000.log};
     \addlegendentry{PSwarm error}
 
 %    \addlegendimage{/pgfplots/refstyle=d1}\addlegendentry{Distortion variance}
     \addlegendimage{/pgfplots/refstyle=d2}\addlegendentry{Distortion best variance}
-    \addplot [mark=x, mark repeat=5, mark options={solid}, black!30!green, dotted, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {4}] {f5-0-4x4-100-dist-3000.log};
+    \addplot [mark=x, mark repeat=5, mark options={solid}, black!30!green, dotted, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {4}] {f5-0-4x4-100-dist-1000.log};
     \addlegendentry{Distortion error}
 \end{axis}
 \end{tikzpicture}
 
+
+
+
+
+
+\begin{tikzpicture}
+\pgfplotsset{scale only axis}
+\begin{axis}[axis y line*=left, xlabel=time (h), ylabel=variance]
+%    \addplot [no marks, red, dashed, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {2}] {f5-0-10x10-100-ga-3000.log};
+%    \label{g1}
+%    \addplot [no marks, red] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {3}] {f5-0-10x10-100-ga-3000.log};
+%    \label{g2}
+
+    \addplot [no marks, blue, dashed, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {2}] {f5-0-10x10-100-swarm-5000.log};
+    \label{s1}
+    \addplot [mark=square, mark repeat=1, mark options={solid}, blue] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {3}] {f5-0-10x10-100-swarm-5000.log};
+    \label{s2}
+
+    \addplot [no marks, black!30!green, dashed, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {2}] {f5-0-10x10-100-dist-1000.log};
+    \label{d1}
+    \addplot [mark=x, mark repeat=1, mark options={solid}, black!30!green] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {3}] {f5-0-10x10-100-dist-1000.log};
+    \label{d2}
+\end{axis}
+\begin{axis}[axis y line*=right, axis x line=none, ylabel=error, legend style={at={(0.5,1.05)},anchor=south}]
+%    \addlegendimage{/pgfplots/refstyle=g1}\addlegendentry{GA variance}
+%    \addlegendimage{/pgfplots/refstyle=g2}\addlegendentry{GA best variance}
+%    \addplot [no marks, dotted, thick, red] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {4}] {f5-0-10x10-100-ga-3000.log};
+%    \addlegendentry{GA error}
+
+%    \addlegendimage{/pgfplots/refstyle=s1}\addlegendentry{PSwarm variance}
+    \addlegendimage{/pgfplots/refstyle=s2}\addlegendentry{PSwarm best variance}
+    \addplot [mark=square, mark repeat=1, mark options={solid}, blue, dotted, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {4}] {f5-0-10x10-100-swarm-5000.log};
+    \addlegendentry{PSwarm error}
+
+%    \addlegendimage{/pgfplots/refstyle=d1}\addlegendentry{Distortion variance}
+    \addlegendimage{/pgfplots/refstyle=d2}\addlegendentry{Distortion best variance}
+    \addplot [mark=x, mark repeat=5, mark options={solid}, black!30!green, dotted, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {4}] {f5-0-10x10-100-dist-1000.log};
+    \addlegendentry{Distortion error}
+\end{axis}
+\end{tikzpicture}
 \end{document}
 
 % \addplot[densely dashdotted, very thick, blue, mark=*,   mark phase=150, mark options={solid, scale=1}, mark repeat=200] table[x=budget, y=Mar-RFw ] {kappaallmediaParesRank.tex}; \addlegendentry{Mar}
