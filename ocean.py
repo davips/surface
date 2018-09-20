@@ -11,14 +11,14 @@
 #     You should have received a copy of the GNU Lesser General Public License
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from sys import argv
-from aux import train_data, test_data, evalu_var, evalu_sum, probe, random_distortion, current_milli_time
+from aux import train_data, test_data, evalu_var, evalu_sum, probe, random_distortion, current_milli_time, median_distortion
 from numpy.random import seed, randint, uniform
 from functions import *
 from plotter import Plotter
 from trip import Trip
 from swarm import swarm_distortion
 from ga import ga_distortion
-from onecity import onecity_distortion2, onecity_distortion
+from custom_distortion import custom_distortion
 
 plot, seedval, time_limit, nb, side, budget, fnumber, alg = argv[1] == 'p', int(argv[2]), int(argv[3]), int(argv[4]), int(argv[5]), int(argv[6]), int(argv[7]), argv[8]
 switcher = {1: f1, 2: f2, 3: f3, 4: f4, 5: f5, 6: f6, 7: f7, 8: f8, 9: f9, 10: f10}
@@ -43,8 +43,9 @@ while current_milli_time() < start + time_limit * 3600000:
     if not first:
         if alg == 'ga': ga_distortion(trip, TSxy)
         if alg == 'sw': swarm_distortion(trip, TSxy)
-        if alg == '1c': onecity_distortion(trip, TSxy, nb, max_failures)
-        # onecity_distortion2(trip, TSxy, nb, max_failures)
+        if alg == '1c': custom_distortion(trip, TSxy, nb, max_failures, random_distortion)
+        if alg == 'sh': custom_distortion(trip, TSxy, nb, max_failures, median_distortion)
+        # custom_distortion2(trip, TSxy, nb, max_failures, random_distortion)
     first = False
 
     print("out: Inducing with simulated data...")
