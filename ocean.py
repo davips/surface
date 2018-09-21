@@ -36,17 +36,21 @@ print('out: Adding points while feasible...')
 trip.try_while_possible(trip.add_maxvar_point(TSxy))
 # trip.try_while_possible(trip.add_random_point)
 
-start, first = current_milli_time(), True
-while current_milli_time() < start + time_limit * 3600000:
+first, acctime = True, 0
+while acctime < time_limit * 3600000:
     trip.tour_time, trip.model_time, trip.pred_time = 0, 0, 0
+    start = current_milli_time()
+
+    if uniform() < 0.20:  trip.remove_at_random()
+    trip.try_while_possible(trip.middle_insertion)
 
     if not first:
         if alg == 'ga': ga_distortion(trip, TSxy)
         if alg == 'sw': swarm_distortion(trip, TSxy)
         if alg == '1c': custom_distortion(trip, TSxy, nb, max_failures, random_distortion)
         if alg == 'sh':
-            custom_distortion(trip, TSxy, nb / 2, max_failures / 2, random_distortion)
-            custom_distortion(trip, TSxy, nb / 2, max_failures / 2, median_distortion)
+            custom_distortion(trip, TSxy, math.ceil(nb / 2), math.ceil(max_failures / 2), random_distortion)
+            custom_distortion(trip, TSxy, math.ceil(nb / 2), math.ceil(max_failures / 2), median_distortion)
         # custom_distortion2(trip, TSxy, nb, max_failures, random_distortion)
     first = False
 
@@ -59,6 +63,7 @@ while current_milli_time() < start + time_limit * 3600000:
         trip.restore2()
 
     # Logging.
+    now = current_milli_time()
     print("out: Inducing with real data to evaluate error...")
     trip2 = Trip(depot, first_xys + trip.xys, first_zs + probe(f, trip.xys), budget, plotter)
     # trip2.select_kernel_and_model()
@@ -66,13 +71,13 @@ while current_milli_time() < start + time_limit * 3600000:
     trip2.fit()
     # trip2.plot_pred()
     error = evalu_sum(trip2.model, TSxy, TSz)
-    print('res:', current_milli_time() - start, trip_var, trip_var_min, error, trip.model_time, trip.pred_time, trip.tour_time, len(trip.tour), str(trip2.kernel).replace(' ', '_'), sep='\t')
+    total = now - start
+    acctime += total
+    other = total - trip.model_time - trip.pred_time - trip.tour_time
+    print('res:', acctime, trip_var, trip_var_min, error, trip.model_time, trip.pred_time, trip.tour_time, other, total, len(trip.tour), str(trip2.kernel).replace(' ', '_'), sep='\t')
 
     # Plotting.
     if plot:
         trip.plot_path()
-
-    if uniform() < 0.20:  trip.remove_at_random()
-    trip.try_while_possible(trip.middle_insertion)
 
 trip.restore2()
