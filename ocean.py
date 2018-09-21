@@ -44,7 +44,9 @@ while current_milli_time() < start + time_limit * 3600000:
         if alg == 'ga': ga_distortion(trip, TSxy)
         if alg == 'sw': swarm_distortion(trip, TSxy)
         if alg == '1c': custom_distortion(trip, TSxy, nb, max_failures, random_distortion)
-        if alg == 'sh': custom_distortion(trip, TSxy, nb, max_failures, median_distortion)
+        if alg == 'sh':
+            custom_distortion(trip, TSxy, nb / 2, max_failures / 2, random_distortion)
+            custom_distortion(trip, TSxy, nb / 2, max_failures / 2, median_distortion)
         # custom_distortion2(trip, TSxy, nb, max_failures, random_distortion)
     first = False
 
@@ -64,7 +66,7 @@ while current_milli_time() < start + time_limit * 3600000:
     trip2.fit()
     # trip2.plot_pred()
     error = evalu_sum(trip2.model, TSxy, TSz)
-    print('res:', current_milli_time() - start, trip_var, trip_var_min, error, trip.model_time, trip.pred_time, trip.tour_time, str(trip2.kernel).replace(' ', '_'), sep='\t')
+    print('res:', current_milli_time() - start, trip_var, trip_var_min, error, trip.model_time, trip.pred_time, trip.tour_time, len(trip.tour), str(trip2.kernel).replace(' ', '_'), sep='\t')
 
     # Plotting.
     if plot:
