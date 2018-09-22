@@ -41,13 +41,13 @@ while acctime < time_limit * 3600000:
     trip.tour_time, trip.model_time, trip.pred_time = 0, 0, 0
     start = current_milli_time()
 
-    if uniform() < 0.20:  trip.remove_at_random()
+    if uniform() < 0.01:  trip.remove_at_random()
     trip.try_while_possible(trip.middle_insertion)
 
     if not first:
         if alg == 'ga': ga_distortion(trip, TSxy)
         if alg == 'sw': swarm_distortion(trip, TSxy)
-        if alg == '1c': custom_distortion(trip, TSxy, nb, max_failures, random_distortion)
+        if alg == '1c': custom_distortion(trip, TSxy, nb, 9999*max_failures, random_distortion)
         if alg == 'sh':
             custom_distortion(trip, TSxy, math.ceil(nb / 2), math.ceil(max_failures / 2), random_distortion)
             custom_distortion(trip, TSxy, math.ceil(nb / 2), math.ceil(max_failures / 2), median_distortion)
@@ -66,7 +66,7 @@ while acctime < time_limit * 3600000:
     now = current_milli_time()
     print("out: Inducing with real data to evaluate error...")
     trip2 = Trip(depot, first_xys + trip.xys, first_zs + probe(f, trip.xys), budget, plotter)
-    # trip2.select_kernel_and_model()
+    # trip2.select_kernel()
     trip2.kernel = trip.kernel
     trip2.fit()
     # trip2.plot_pred()
