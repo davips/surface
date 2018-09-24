@@ -47,7 +47,7 @@ while acctime < time_limit * 3600000:
     if not first:
         if alg == 'ga': ga_distortion(trip, TSxy)
         if alg == 'sw': swarm_distortion(trip, TSxy)
-        if alg == '1c': custom_distortion(trip, TSxy, nb, 9999*max_failures, random_distortion)
+        if alg == '1c': custom_distortion(trip, TSxy, nb, 9999 * max_failures, random_distortion)
         if alg == 'sh':
             custom_distortion(trip, TSxy, math.ceil(nb / 2), math.ceil(max_failures / 2), random_distortion)
             custom_distortion(trip, TSxy, math.ceil(nb / 2), math.ceil(max_failures / 2), median_distortion)
@@ -67,8 +67,7 @@ while acctime < time_limit * 3600000:
     print("out: Inducing with real data to evaluate error...")
     trip2 = Trip(depot, first_xys + trip.xys, first_zs + probe(f, trip.xys), budget, plotter)
     # trip2.select_kernel()
-    trip2.kernel = trip.kernel
-    trip2.fit()
+    trip2.fit(trip.kernel, 10)
     # trip2.plot_pred()
     error = evalu_sum(trip2.model, TSxy, TSz)
     total = now - start

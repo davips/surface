@@ -49,7 +49,7 @@ class Trip:
         self.kernel = kernel_selector(self.first_xys, self.first_zs)
         self.model_time += current_milli_time() - start
 
-    def fit(self, n=5, kernel=None):
+    def fit(self, kernel=None, n=5):
         start = current_milli_time()
         if kernel is None: kernel = self.kernel
         # self.model = GaussianProcessRegressor(kernel=RationalQuadratic(length_scale_bounds=(0.08, 100)) + WhiteKernel(noise_level_bounds=(1e-5, 1e-2)), n_restarts_optimizer=10)
