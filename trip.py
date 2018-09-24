@@ -49,11 +49,11 @@ class Trip:
         self.kernel = kernel_selector(self.first_xys, self.first_zs)
         self.model_time += current_milli_time() - start
 
-    def fit(self, kernel=None):
+    def fit(self, n=5, kernel=None):
         start = current_milli_time()
         if kernel is None: kernel = self.kernel
         # self.model = GaussianProcessRegressor(kernel=RationalQuadratic(length_scale_bounds=(0.08, 100)) + WhiteKernel(noise_level_bounds=(1e-5, 1e-2)), n_restarts_optimizer=10)
-        self.model = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=25, copy_X_train=True)
+        self.model = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=n, copy_X_train=True)
         self.model.fit(self.first_xys, self.first_zs)
         self.model_time += current_milli_time() - start
 
@@ -160,7 +160,9 @@ class Trip:
         if self.plotter is not None: self.plotter.surface(lambda x, y: self.model.predict([(x, y)])[0], 30, 0, 50)
 
     def fitness(self, xys, TSxy, distortf=no_distortion):
-        """Return "total" variance of a given solution xys for a given test set."""
+        """Return "total" variance of a given solution xys for a given test set.
+           May sum up time elapsed across different threads (e.g. when used inside swarm.py).
+        """
         trip = Trip(self.depot, self.first_xys, self.first_zs, self.budget)
         trip.xys = xys.copy()
         if distortf != no_distortion:
