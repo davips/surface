@@ -18,7 +18,7 @@ from plotter import Plotter
 from trip import Trip
 from swarm import swarm_distortion
 from ga import ga_distortion
-from custom_distortion import custom_distortion
+from custom_distortion import custom_distortion3, custom_distortion
 
 plot, seedval, time_limit, nb, side, budget, fnumber, alg = argv[1] == 'p', int(argv[2]), int(argv[3]), int(argv[4]), int(argv[5]), int(argv[6]), int(argv[7]), argv[8]
 switcher = {1: f1, 2: f2, 3: f3, 4: f4, 5: f5, 6: f6, 7: f7, 8: f8, 9: f9, 10: f10}
@@ -41,29 +41,31 @@ while acctime < time_limit * 3600000:
     trip.tour_time, trip.model_time, trip.pred_time = 0, 0, 0
     start = current_milli_time()
 
-    if uniform() < 0.01:  trip.remove_at_random()
+    if uniform() < 0.001:  trip.remove_at_random()
     trip.try_while_possible(trip.middle_insertion)
 
     if not first:
         if alg == 'ga': ga_distortion(trip, TSxy)
         if alg == 'sw': swarm_distortion(trip, TSxy)
-        if alg == '1c': custom_distortion(trip, TSxy, nb, 9999 * max_failures, random_distortion)
+        if alg == 'a3': custom_distortion3(trip, TSxy, nb, random_distortion)
+        if alg == '1c': custom_distortion(trip, TSxy, nb, random_distortion)
         if alg == 'sh':
             custom_distortion(trip, TSxy, math.ceil(nb / 2), math.ceil(max_failures / 2), random_distortion)
             custom_distortion(trip, TSxy, math.ceil(nb / 2), math.ceil(max_failures / 2), median_distortion)
         # custom_distortion2(trip, TSxy, nb, max_failures, random_distortion)
     first = False
 
+    now = current_milli_time()
+
     print("out: Inducing with simulated data...")
     trip_var = sum(trip.stds_simulated(TSxy))
     if trip_var < trip_var_min:
         trip_var_min = trip_var
-        trip.store2()
-    else:
-        trip.restore2()
+    #     trip.store2()
+    # else:
+    #     trip.restore2()
 
     # Logging.
-    now = current_milli_time()
     print("out: Inducing with real data to evaluate error...")
     trip2 = Trip(depot, first_xys + trip.xys, first_zs + probe(f, trip.xys), budget, plotter)
     # trip2.select_kernel()
