@@ -166,7 +166,7 @@ class Trip:
         trip = Trip(self.depot, self.first_xys, self.first_zs, self.budget)
         trip.xys = xys.copy()
         if distortf != no_distortion:
-            trip.tour = self.tour.copy() # Copy tour just to be able to call distort().
+            trip.tour = self.tour.copy()  # Copy tour just to be able to call distort().
             trip.distort(distortf)
         trip.kernel = self.kernel
         trip.fit()
@@ -188,6 +188,13 @@ class Trip:
         """Apply a custom distortion function to one random point between depot and last."""
         points = [self.depot] + self.xys
         ttt = list(zip(self.tour, self.tour[1:], self.tour[2:]))
+        print(len(ttt) - 2)
         ida, idb, idc = ttt[randint(len(ttt) - 2)]
         (a, b), (c, d), (e, f) = points[ida], points[idb], points[idc]
         self.xys[idb - 1] = distortion_function(a, b, c, d, e, f)
+
+    def distort1b(self, distortion_function):
+        """Apply a custom distortion function to one random point."""
+        idx = randint(len(self.xys))
+        (a, b) = self.xys[idx]
+        self.xys[idx] = distortion_function(a - 0.1, b, a, b, a + 0.1, b)
