@@ -19,7 +19,7 @@ from oldtrip import *
 from numpy.random import normal, uniform
 
 popsize = 49
-select, iters = round(math.sqrt(popsize)), round(3000 / popsize)
+select, iters = round(math.sqrt(popsize)), round(5000 / popsize)
 
 
 def select_fittest(distr):

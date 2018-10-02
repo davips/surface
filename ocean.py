@@ -55,8 +55,6 @@ while acctime < time_limit * 3600000:
         # custom_distortion2(trip, TSxy, nb, max_failures, random_distortion)
     first = False
 
-    now = current_milli_time()
-
     print("out: Inducing with simulated data...")
     trip_var = sum(trip.stds_simulated(TSxy))
     if trip_var < trip_var_min:
@@ -66,6 +64,7 @@ while acctime < time_limit * 3600000:
     #     trip.restore2()
 
     # Logging.
+    now = current_milli_time()
     print("out: Inducing with real data to evaluate error...")
     trip2 = Trip(depot, first_xys + trip.xys, first_zs + probe(f, trip.xys), budget, plotter)
     # trip2.select_kernel()
