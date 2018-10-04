@@ -8,7 +8,7 @@ def custom_distortion(trip, TSxy, nb, distortionf, max_failures=9999999):
     trip.store3()
     failures = 0
     for b in range(0, nb):
-        trip.distort1(distortionf)
+        trip.distort1b(distortionf)
         trip.calculate_tour()
         if trip.feasible: trip_var = sum(trip.stds_simulated(TSxy))
         if trip.feasible and trip_var < trip_var_min:
@@ -20,6 +20,7 @@ def custom_distortion(trip, TSxy, nb, distortionf, max_failures=9999999):
             if failures > max_failures: break
             trip.restore3()
     trip.restore3()
+    return trip_var_min
 
 
 def custom_distortion2(trip, TSxy, nb, max_failures, distortionf):

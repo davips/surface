@@ -33,7 +33,7 @@ trip_var_min = 9999999
 
 print('out: Adding points while feasible...')
 # trip.plotvar = True
-trip.try_while_possible(trip.add_maxvar_point(TSxy))
+trip.add_while_possible(trip.add_maxvar_point(TSxy))
 # trip.try_while_possible(trip.add_random_point)
 
 first, acctime = True, 0
@@ -42,7 +42,7 @@ while acctime < time_limit * 3600000:
     start = current_milli_time()
 
     if uniform() < 0.001:  trip.remove_at_random()
-    trip.try_while_possible(trip.middle_insertion)
+    trip.add_while_possible(trip.middle_insertion)
 
     if not first:
         if alg == 'ga': ga_distortion(trip, TSxy)
