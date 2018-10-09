@@ -249,7 +249,7 @@ def median_distortion(a, b, c, d, e, f):
 
 
 def random_distortion(a, b, c, d, e, f):
-    s = 0.05 * (dist(a, b, c, d) + dist(c, d, e, f)) / 2
+    s = 0.5 * (dist(a, b, c, d) + dist(c, d, e, f)) / 2
     x, y = c + normal(scale=s), d + normal(scale=s)
     if x > 1: x = 1
     if y > 1: y = 1
