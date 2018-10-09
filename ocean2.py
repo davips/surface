@@ -20,7 +20,7 @@ from swarm import swarm_distortion
 from ga import ga_distortion
 from custom_distortion import custom_distortion, custom_distortion4
 
-plot, seedval, time_limit, nb, side, budget, fnumber, alg = argv[1] == 'p', int(argv[2]), int(argv[3]), int(argv[4]), int(argv[5]), int(argv[6]), int(argv[7]), argv[8]
+plot, seedval, time_limit, nb, side, budget, fnumber, alg = argv[1] == 'p', int(argv[2]), float(argv[3]), int(argv[4]), int(argv[5]), int(argv[6]), int(argv[7]), argv[8]
 switcher = {1: f1, 2: f2, 3: f3, 4: f4, 5: f5, 6: f6, 7: f7, 8: f8, 9: f9, 10: f10}
 f = switcher.get(fnumber)
 seed(seedval)
@@ -31,19 +31,22 @@ print('out: selecting kernel...')
 trip.select_kernel()  # TOD
 print('out: fitting...')
 trip.fit()
+conta, acctime = 0, 0
 trip_var_min = sum(trip.stds_simulated(TSxy))
-first, acctime = True, 0
 while acctime < time_limit * 3600000:
     trip.tour_time, trip.model_time, trip.pred_time = 0, 0, 0
     start = current_milli_time()
 
     # trip.plotvar = True
-    trip.add_while_possible(trip.add_maxvar_point(TSxy))
+    if conta > 0: trip.add_while_possible(trip.add_maxvar_point(TSxy))
 
-    if not first:
+    if conta == 1:
+        trip_var_min = sum(trip.stds_simulated(TSxy))
+    elif conta > 1:
         if alg == 'a4': trip_var_min = custom_distortion4(trip, TSxy, nb, random_distortion, nb / 3)
         if alg == '1c': trip_var_min = custom_distortion(trip, TSxy, nb, random_distortion, nb / 3)
-    first = False
+        if alg == 'sw': trip_var_min = swarm_distortion(trip, TSxy)
+    conta += 1
 
     # Logging.
     now = current_milli_time()
@@ -61,4 +64,3 @@ while acctime < time_limit * 3600000:
     # Plotting.
     if plot:
         trip.plot_path()
-

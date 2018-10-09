@@ -49,7 +49,7 @@ class Trip:
         self.kernel = kernel_selector(self.first_xys, self.first_zs)
         self.model_time += current_milli_time() - start
 
-    def fit(self, kernel=None, n=5):
+    def fit(self, kernel=None, n=4):
         start = current_milli_time()
         if kernel is None: kernel = self.kernel
         # self.model = GaussianProcessRegressor(kernel=RationalQuadratic(length_scale_bounds=(0.08, 100)) + WhiteKernel(noise_level_bounds=(1e-5, 1e-2)), n_restarts_optimizer=10)
@@ -58,7 +58,7 @@ class Trip:
         self.model_time += current_milli_time() - start
 
     def calculate_tour(self):
-        """ps. Keep the old tour if it's still within the budget and the number of cities remains compatible (the same)."""
+        """ps. Keep the old tour if it's still within the budget and the number of cities remains compatible (i.e. the same)."""
         start = current_milli_time()
         xys = [self.depot] + self.xys
         n = len(self.tour)
@@ -186,11 +186,11 @@ class Trip:
         trip.kernel = self.kernel
         trip.fit()
         trip.calculate_tour()
-        v = sum(trip.stds_simulated(TSxy)) + (0 if trip.feasible else 10000 * (trip.cost - trip.budget)), trip.xys
+        v = sum(trip.stds_simulated(TSxy)) + (0 if trip.feasible else 10000 * (trip.cost - trip.budget))
         self.tour_time += trip.tour_time
         self.pred_time += trip.pred_time
         self.model_time += trip.model_time
-        return v
+        return v, trip.xys
 
     def distort(self, distortion_function):
         """Apply a custom distortion function to all points, except depot and last."""
