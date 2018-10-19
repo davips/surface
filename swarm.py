@@ -19,7 +19,7 @@ from trip import Trip
 
 def swarm_distortion(trip, testset_xy):
     def py_outf(it, leader, fx, x):
-        return 1.0  # negative number = stop
+        return 1.0  # negative number = stop (when I used the stopper, it returned a solution worse than the initial)
 
     def py_objf(xs):
         def var(x):
@@ -33,7 +33,7 @@ def swarm_distortion(trip, testset_xy):
     variabs = len(x0)
     problem = {'Variables': variabs, 'objf': py_objf, 'lb': zeros(variabs), 'ub': ones(variabs), 'x0': x0}
     # , 'A': [[-1.0 / sqrt(3), 1], [-1.0, sqrt(3)], [1.0, sqrt(3)]], 'b': [0, 0, 6]
-    options = {'maxf': 10000, 'maxit': 10000, 'social': 0.5, 'cognitial': 0.5, 'fweight': 0.4
+    options = {'maxf': 4000, 'maxit': 4000, 'social': 0.5, 'cognitial': 0.5, 'fweight': 0.4
         , 'iweight': 0.9, 'size': 100, 'iprint': 10, 'tol': 1E-5, 'ddelta': 0.5, 'idelta': 2.0
         , 'outputfcn': py_outf, 'vectorized': 1}
     result = pswarm(problem, options)
