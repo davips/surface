@@ -13,7 +13,7 @@
 from sklearn.gaussian_process.kernels import Matern, RationalQuadratic, WhiteKernel
 from numpy.random import uniform, randint
 from plotter import Plotter
-from aux import kernel_selector, plan_tour, current_milli_time, no_distortion, random_distortion, dist
+from aux import kernel_selector, plan_tour, current_milli_time, no_distortion, random_distortion, dist, probe
 from sklearn.gaussian_process import GaussianProcessRegressor
 
 
@@ -35,7 +35,7 @@ class Trip:
         # self.kernel = Matern(length_scale_bounds=(0.000001, 100000), nu=2.5) + WhiteKernel(noise_level_bounds=(1e-5, 1e-2))
         # self.kernel = RationalQuadratic(length_scale_bounds=(0.08, 100)) + WhiteKernel(noise_level_bounds=(1e-5, 1e-2))
         self.kernel = RationalQuadratic(length_scale_bounds=(0.08, 100))
-        self.xys, self.zs, self.tour, self.cost = [], [], [], 0
+        self.xys, self.tour, self.cost = [], [], 0
         self.plotter = plotter
         self.budget = budget
         self.model_time = 0
@@ -43,22 +43,24 @@ class Trip:
         self.pred_time = 0
         self.plotvar = False
         self.plotpred = False
+        self.cost_is_optimal = False
+        self.feasible = False
 
     def select_kernel(self):
         start = current_milli_time()
         self.kernel = kernel_selector(self.first_xys, self.first_zs)
         self.model_time += current_milli_time() - start
 
-    def fit(self, kernel=None, n=4):
+    def fit(self, kernel=None, n_restarts_optimizer=4):
         start = current_milli_time()
         if kernel is None: kernel = self.kernel
         # self.model = GaussianProcessRegressor(kernel=RationalQuadratic(length_scale_bounds=(0.08, 100)) + WhiteKernel(noise_level_bounds=(1e-5, 1e-2)), n_restarts_optimizer=10)
-        self.model = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=n, copy_X_train=True)
+        self.model = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=n_restarts_optimizer, copy_X_train=True)
         self.model.fit(self.first_xys, self.first_zs)
         self.model_time += current_milli_time() - start
 
     def calculate_tour(self):
-        """ps. Keep the old tour if it's still within the budget and the number of cities remains compatible (i.e. the same)."""
+        """ps. Keep the old tour if it's still within the budget and the number of cities remains compatible with the tour length."""
         start = current_milli_time()
         xys = [self.depot] + self.xys
         n = len(self.tour)
@@ -69,40 +71,53 @@ class Trip:
             c, d = xys[tmptour[i + 1]]
             self.cost += dist(a, b, c, d)
 
+        self.cost_is_optimal = False
         if self.cost > self.budget or self.tour == [] or n != len(xys):
-            self.tour, self.feasible, self.cost = plan_tour([self.depot] + self.xys, self.budget, exact=True)
+            self.tour, self.feasible, self.cost, self.cost_is_optimal = plan_tour([self.depot] + self.xys, self.budget, exact=True)
 
         self.tour_time += current_milli_time() - start
 
     def store(self):
         self.stored_xys = self.xys.copy()
         self.stored_tour = self.tour.copy()
+        self.stored_cost = self.cost
+        self.stored_feasible = self.feasible
 
     def restore(self):
         self.xys = self.stored_xys.copy()
         self.tour = self.stored_tour.copy()
+        self.cost = self.stored_cost
+        self.feasible = self.stored_feasible
 
     def store2(self):
         self.stored2_xys = self.xys.copy()
         self.stored2_tour = self.tour.copy()
+        self.stored2_cost = self.cost
+        self.stored2_feasible = self.feasible
 
     def restore2(self):
         self.xys = self.stored2_xys.copy()
         self.tour = self.stored2_tour.copy()
+        self.cost = self.stored2_cost
+        self.feasible = self.stored2_feasible
 
     def store3(self):
         self.stored3_xys = self.xys.copy()
         self.stored3_tour = self.tour.copy()
+        self.stored3_cost = self.cost
+        self.stored3_feasible = self.feasible
 
     def restore3(self):
         self.xys = self.stored3_xys.copy()
         self.tour = self.stored3_tour.copy()
+        self.cost = self.stored3_cost
+        self.feasible = self.stored3_feasible
 
     def add_while_possible(self, f):
-        """Apply f() to add a point while the tour is feasible."""
+        """Apply f() (to add a point) while the tour is feasible."""
         self.store()
         while True:
-            if self.cost + 1 > self.budget:
+            if self.cost_is_optimal and self.cost + 1 > self.budget:
                 self.restore()
                 break
             f()
@@ -212,3 +227,19 @@ class Trip:
         idx = randint(len(self.xys))
         (a, b) = self.xys[idx]
         self.xys[idx] = distortion_function(a - 0.1, b, a, b, a + 0.1, b)
+
+    def probe_next(self, f):
+        """Reveal the value of the next point in the trip, passing it from the list of points to visit to the list of points already known. Depot also is changed. Budget is consumed."""
+        idx = self.tour[1]
+        a, b = self.depot
+        c, d = self.xys[idx - 1]
+        spent = dist(a, b, c, d) + 1
+        self.budget -= spent
+        self.cost -= spent
+        self.depot = self.xys[idx - 1]
+        del self.xys[idx - 1]
+        self.first_xys.append(self.depot)
+        self.first_zs.append(f(*self.depot))
+        self.tour.remove(idx)
+        for i in range(0, len(self.tour)):
+            if self.tour[i] > idx: self.tour[i] -= 1

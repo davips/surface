@@ -13,13 +13,15 @@
 
 from pswarm_py import pswarm
 from numpy import zeros, ones
-from aux import tuplefy, probe, flat
+from aux import tuplefy, probe, flat, current_milli_time
 from trip import Trip
 
 
-def swarm_distortion(trip, testset_xy):
+def swarm_distortion(trip, testset_xy, available_time):
     def py_outf(it, leader, fx, x):
-        return 1.0  # negative number = stop (when I used the stopper, it returned a solution worse than the initial)
+        elapsed = current_milli_time() - start
+        # print(available_time - elapsed )
+        return available_time - elapsed  # negative number = stop
 
     def py_objf(xs):
         def var(x):
@@ -29,6 +31,7 @@ def swarm_distortion(trip, testset_xy):
 
         return [var(x) for x in xs]
 
+    start = current_milli_time()
     x0 = flat(trip.xys)
     variabs = len(x0)
     problem = {'Variables': variabs, 'objf': py_objf, 'lb': zeros(variabs), 'ub': ones(variabs), 'x0': x0}
@@ -40,4 +43,5 @@ def swarm_distortion(trip, testset_xy):
     if result['ret'] == 0:  # zero means successful
         new_xys = tuplefy(result['x'])
         trip.xys = new_xys.copy()
-    return sum(trip.stds_simulated(testset_xy))
+    # print('>>>>>>', sum(trip.stds_simulated(testset_xy)))
+    return result['f']

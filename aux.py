@@ -43,7 +43,7 @@ def kernel_selector(xys, zs):
     # find best kernel on k-fold CV
     min_error = 99999
     for kernel0 in kernels:
-        kernel = kernel0  + WhiteKernel(noise_level_bounds=(1e-5, 1e-2))
+        kernel = kernel0 + WhiteKernel(noise_level_bounds=(1e-5, 1e-2))
         gpr = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10, copy_X_train=True)
         # model = GaussianProcessRegressor(kernel=kernel + WhiteKernel(noise_level_bounds=(1e-5, 1e-2)), n_restarts_optimizer=10, copy_X_train=True)
         err = -1 * cross_val_score(gpr, xys, zs, scoring='neg_mean_absolute_error', cv=5).mean()
@@ -129,6 +129,8 @@ def plan_tour(xys, budget, exact):
             c[i, j] = dist(*pos[i], *pos[j])
             c[j, i] = c[i, j]
 
+    cost_is_optimal = False
+
     if n > 2:
         # heuristic
         sol_, cost = multistart_localsearch(100, n, c, cutoff=budget - n)  # inst.T - (N) * inst.t)
@@ -142,18 +144,21 @@ def plan_tour(xys, budget, exact):
                 cost, edges = solve_tsp(range(n), c)
                 cost = complete_cost(cost, n)
                 sol = sequence(range(n), edges)
+                cost_is_optimal = True
             else:
                 pass
                 print('NOT trying exact solution')
     elif n == 1:
         cost = 0
         sol = [0]
+        cost_is_optimal = True
     else:
         cost = dist(*pos[0], *pos[1])
         cost = complete_cost(cost, n)
         sol = [0, 1]
+        cost_is_optimal = True
 
-    return sol, cost <= budget, cost
+    return sol, cost <= budget, cost, cost_is_optimal
 
 
 def evalu_max(g, xys, zs):
@@ -260,3 +265,7 @@ def random_distortion(a, b, c, d, e, f):
 
 def current_milli_time():
     return int(round(time.time() * 1000))
+
+
+def fo(n):
+    return round(1000 * n) / 1000.0
