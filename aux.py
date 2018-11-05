@@ -27,10 +27,10 @@ ngrid = 100
 
 def kernel_selector(xys, zs):
     # define limits of the hyperparameter space
-    # bounds = [(0.00001, 0.0001), (0.0001, 0.001), (0.001, 0.01), (0.01, 0.1), (0.1, 1), (1, 10), (10, 100), (100, 1000), (1000, 10000), (10000, 100000)]
-    # nu_bounds = [0.1, 0.5, 1, 1.5, 2, 2.5, 5, 20]
-    bounds = [(0.00001, 0.001), (0.001, 0.1), (0.1, 10), (10, 1000), (1000, 100000)]
-    nu_bounds = [0.5, 1.5, 2.5]
+    bounds = [(0.00001, 0.0001), (0.0001, 0.001), (0.001, 0.01), (0.01, 0.1), (0.1, 1), (1, 10), (10, 100), (100, 1000), (1000, 10000), (10000, 100000)]
+    nu_bounds = [0.1, 0.5, 1, 1.5, 2, 2.5, 5, 20]
+    # bounds = [(0.00001, 0.001), (0.001, 0.1), (0.1, 10), (10, 1000), (1000, 100000)]
+    # nu_bounds = [0.5, 1.5, 2.5]
 
     # generate list of kernels to assess
     quads = [RationalQuadratic(length_scale_bounds=(a, b), alpha_bounds=(c, d)) for a, b in bounds for c, d in bounds]
