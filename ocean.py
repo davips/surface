@@ -19,18 +19,29 @@ from trip import Trip
 from swarm import swarm_distortion
 from ga import ga_distortion
 from custom_distortion import custom_distortion, custom_distortion4
+from memory_profiler import profile
 
+# Process arguments.
 plot, seedval, time_limit, nb, side, budget, fnumber, alg, online = argv[1] == 'p', int(argv[2]), float(argv[3]), int(argv[4]), int(argv[5]), int(argv[6]), int(argv[7]), argv[8], argv[9] == 'on'
 switcher = {1: f1, 2: f2, 3: f3, 4: f4, 5: f5, 6: f6, 7: f7, 8: f8, 9: f9, 10: f10}
 f = switcher.get(fnumber)
+
+# Initial settings.
 seed(seedval)
 (first_xys, first_zs), (TSxy, TSz), depot, max_failures = train_data(side, f, False), test_data(f), (-0.00001, -0.00001), math.ceil(nb / 5)
 plotter = Plotter('surface') if plot else None
+
+# Create initial model with kernel selected by cross-validation.
 trip = Trip(depot, first_xys, first_zs, budget, plotter)
 print('out: selecting kernel...')
 trip.select_kernel()  # TOD
 print('out: fitting...')
 trip.fit()
+
+# Main loop. Report stddev and error...: first iteration -> ...using only known points; (conta == 0)
+#                                        second iteration -> ...after orienteering; (conta == 1)
+#                                        third iteration -> ...after first distortion; (conta == 2)
+#                                        next iterations -> ...after probing [only for online mode] and next distortions; (conta > 2)
 conta, acctime = 0, 0
 trip_var_min = sum(trip.stds_simulated(TSxy))
 while acctime < time_limit * 3600000:

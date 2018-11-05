@@ -11,8 +11,8 @@ Copy gurobi folder (gurobi752 ?) to the current folder, if exact search is neede
 # usage example (linux bash)
 ```
 seed=0          # seed to start pseudo number generation
-timelimit=1     # total execution time for the program
-logafter=100    # number of iterations of algorithm 1c (i-city distortion/VOCAL paper) between logs
+timelimit=1     # total execution time for the program in hours
+logafter=100    # number of iterations of algorithm 1c (1-city-at-a-time distortion/VOCAL paper) between logs
 budget=100      # total time available for the trip (includes probing time)
 mode="off"      # off (static) or on (dynamic) - line version
 alias avoidnumpywarnings='e -v gaussian_process | e -v np.newaxis | e -v convergence_dict | e -v warnings.warn'
