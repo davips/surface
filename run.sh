@@ -9,7 +9,7 @@ for function in `seq 1 10`; do
   for gridsize in `echo 10 7 4`; do
     for algorithm in `echo 1c sw`; do    # sw = Particle Swarm Optmization (PSO parameters should be choosen inside swarm.py; currently 4000 iterations and pop. size 100)
       echo f$function-$seed-${gridsize}x$gridsize-$budget-$algorithm-$timelimit.$mode.log ...
-      time python -u ocean.py dontplot $seed $timelimit $logafter $gridsize $budget $function $algorithm $mode 2> >(grep -v gaussian_process | grep -v np.newaxis | grep -v convergence_dict | grep -v warnings.warn) | grep res: | tee f$function-$seed-${gridsize}x$gridsize-$budget-$algorithm-$timelimit.$mode.log
+      time python -u ocean.py dontplot $seed $timelimit $logafter $gridsize $budget $function $algorithm $mode 2> >(grep -v gaussian_process | grep -v np.newaxis | grep -v convergence_dict | grep -v warnings.warn) | tee f$function-$seed-${gridsize}x$gridsize-$budget-$algorithm-$timelimit.$mode.log
     done
   done
 done

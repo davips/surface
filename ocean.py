@@ -33,9 +33,9 @@ plotter = Plotter('surface') if plot else None
 
 # Create initial model with kernel selected by cross-validation.
 trip = Trip(depot, first_xys, first_zs, budget, plotter)
-print('out: selecting kernel...')
+print('# selecting kernel...')
 trip.select_kernel()  # TOD
-print('out: fitting...')
+print('# fitting...')
 trip.fit()
 
 # Main loop. Report stddev and error...: first iteration -> ...using only known points; (conta == 0)
@@ -65,7 +65,7 @@ while acctime < time_limit * 3600000:
 
     # Logging.
     now = current_milli_time()
-    print("out: Inducing with real data to evaluate error...")
+    print("# Inducing with real data to evaluate error...")
     trip2 = Trip(depot, trip.first_xys, trip.first_zs, trip.budget, plotter) if online else Trip(depot, trip.first_xys + trip.xys, trip.first_zs + probe(f, trip.xys), trip.budget, plotter)
     # trip2.select_kernel()
     trip2.fit(trip.kernel, 10)
