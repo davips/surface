@@ -147,7 +147,7 @@ def plan_tour(xys, budget, exact):
                 cost_is_optimal = True
             else:
                 pass
-                print('NOT trying exact solution')
+                print('# NOT trying exact solution')
     elif n == 1:
         cost = 0
         sol = [0]
@@ -238,7 +238,7 @@ def tuplefy(x):
 
 
 def log(str):
-    print('out:\t' + str)
+    print('# out:\t' + str)
 
 
 def no_distortion(a, b, c, d, e, f):

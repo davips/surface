@@ -3,7 +3,7 @@ from aux import evalu_var
 
 def custom_distortion(trip, TSxy, nb, distortionf, max_failures=9999999):
     """Distort one city at a time. Allow temporary max_failures setbacks."""
-    print('out: Distorting one city at a time...')
+    print('# Distorting one city at a time...')
     trip_var_min = sum(trip.stds_simulated(TSxy))
     trip.store3()
     failures = 0
@@ -25,7 +25,7 @@ def custom_distortion(trip, TSxy, nb, distortionf, max_failures=9999999):
 
 def custom_distortion2(trip, TSxy, nb, max_failures, distortionf):
     """Distort one city at a time. Maximize variance over the tour."""
-    print('out: Distorting one city at a time...')
+    print('# Distorting one city at a time...')
     trip_var_max = evalu_var(trip, trip.xys)
     trip.store3()
     failures = 0
@@ -46,7 +46,7 @@ def custom_distortion2(trip, TSxy, nb, max_failures, distortionf):
 
 def custom_distortion3(trip, TSxy, nb, distortionf):
     """Distort one city at a time. Not greedy."""
-    print('out: Distorting one city at a time...')
+    print('# Distorting one city at a time...')
     trip_var_min = sum(trip.stds_simulated(TSxy))
     trip.store3()
     for b in range(0, nb):
@@ -61,7 +61,7 @@ def custom_distortion3(trip, TSxy, nb, distortionf):
 
 def custom_distortion4(trip, TSxy, nb, distortionf, max_failures=9999999):
     """Distort one city at a time. Allow temporary max_failures setbacks. Cheaply, only check tour at the end, backtracking."""
-    print('out: Finding better variance, without checking tour feasibility...')
+    print('# Finding better variance, without checking tour feasibility...')
     trip_var_min = sum(trip.stds_simulated(TSxy))
     queue = [(trip.xys.copy(), trip_var_min)]
     failures = 0
@@ -78,7 +78,7 @@ def custom_distortion4(trip, TSxy, nb, distortionf, max_failures=9999999):
             if failures > max_failures:
                 break
 
-    print('out: Selecting best feasible solution...')
+    print('# Selecting best feasible solution...')
     while True:
         trip.xys, trip_var_min = queue.pop()
         trip.calculate_tour()
