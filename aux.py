@@ -120,7 +120,15 @@ def complete_cost(cost, n):
     return cost + n
 
 
-def plan_tour(xys, budget, exact):
+def plan_tour(xys, budget, exact, fixed=[]):
+    """
+    Calculates a tour over all given points.
+    :param xys: list of points to visit
+    :param budget: limit of points to visit + length limit
+    :param exact: whether or not to run Gurobi
+    :param fixed: segments of the trip already travelled (using this option avoids heuristic mode [multistart_localsearch])
+    :return: solution, feasibility, cost of the tour including probings, whether the tour is optimal
+    """
     n = len(xys)
     pos = xys
     c = {}
@@ -133,15 +141,16 @@ def plan_tour(xys, budget, exact):
 
     if n > 2:
         # heuristic
-        sol_, cost = multistart_localsearch(100, n, c, cutoff=budget - n)  # inst.T - (N) * inst.t)
-        idx = sol_.index(0)
-        sol = sol_[idx:] + sol_[:idx]
-        cost = complete_cost(cost, n)
+        if len(fixed) == 0:
+            sol_, cost = multistart_localsearch(100, n, c, cutoff=budget - n)  # inst.T - (N) * inst.t)
+            idx = sol_.index(0)
+            sol = sol_[idx:] + sol_[:idx]
+            cost = complete_cost(cost, n)
 
         # exact
-        if cost > budget:
+        if len(fixed) > 0 or cost > budget:
             if exact:
-                cost, edges = solve_tsp(range(n), c)
+                cost, edges = solve_tsp(range(n), c, False, fixed)
                 cost = complete_cost(cost, n)
                 sol = sequence(range(n), edges)
                 cost_is_optimal = True
