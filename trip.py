@@ -45,6 +45,7 @@ class Trip:
         self.plotpred = False
         self.cost_is_optimal = False
         self.feasible = False
+        self.fixed = []
 
     def select_kernel(self):
         start = current_milli_time()
@@ -73,7 +74,7 @@ class Trip:
 
         self.cost_is_optimal = False
         if self.cost > self.budget or self.tour == [] or n != len(xys):
-            self.tour, self.feasible, self.cost, self.cost_is_optimal = plan_tour([self.depot] + self.xys, self.budget, exact=True)
+            self.tour, self.feasible, self.cost, self.cost_is_optimal = plan_tour([self.depot] + self.xys, self.budget, True, self.fixed)
 
         self.tour_time += current_milli_time() - start
 
@@ -228,8 +229,24 @@ class Trip:
         (a, b) = self.xys[idx]
         self.xys[idx] = distortion_function(a - 0.1, b, a, b, a + 0.1, b)
 
-    def probe_next(self, f):
+    def old_probe_next(self, f):
         """Reveal the value of the next point in the trip, passing it from the list of points to visit to the list of points already known. Depot also is changed. Budget is consumed."""
+        idx = self.tour[1]
+        a, b = self.depot
+        c, d = self.xys[idx - 1]
+        spent = dist(a, b, c, d) + 1
+        self.budget -= spent
+        self.cost -= spent
+        self.depot = self.xys[idx - 1]
+        del self.xys[idx - 1]
+        self.first_xys.append(self.depot)
+        self.first_zs.append(f(*self.depot))
+        self.tour.remove(idx)
+        for i in range(0, len(self.tour)):
+            if self.tour[i] > idx: self.tour[i] -= 1
+
+    def probe_next(self, f):
+        """Reveal the value of the next point in the trip, passing it to the list of fixed (already visited) segments and to the list of points already known."""
         idx = self.tour[1]
         a, b = self.depot
         c, d = self.xys[idx - 1]
