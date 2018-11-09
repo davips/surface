@@ -85,6 +85,7 @@ print('# res:', trip.xys, sep='\t')
 print('# res:', trip.cost, trip.tour, sep='\t')
 for i in range(10):
     trip2 = Trip(depot, trip.first_xys + trip.xys, trip.first_zs + probe(f, trip.xys), trip.budget, plotter)
-    trip2.fit(trip.kernel, 10)
+    trip2.select_kernel()
+    trip2.fit(n_restarts_optimizer=100)
     error = evalu_sum(trip2.model, TSxy, TSz)
     print('# res:', sum(trip.stds_simulated(TSxy)), error, sep='\t')
