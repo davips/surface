@@ -45,7 +45,8 @@ class Trip:
         self.plotpred = False
         self.cost_is_optimal = False
         self.feasible = False
-        self.fixed = []
+        self.fixed_tour = []
+        self.fixed_xys = []
 
     def select_kernel(self):
         start = current_milli_time()
@@ -74,7 +75,7 @@ class Trip:
 
         self.cost_is_optimal = False
         if self.cost > self.budget or self.tour == [] or n != len(xys):
-            self.tour, self.feasible, self.cost, self.cost_is_optimal = plan_tour([self.depot] + self.xys, self.budget, True, self.fixed)
+            self.tour, self.feasible, self.cost, self.cost_is_optimal = plan_tour([self.depot] + self.fixed_xys + self.xys, self.budget, True, self.fixed_tour)
 
         self.tour_time += current_milli_time() - start
 
@@ -200,6 +201,8 @@ class Trip:
             trip.tour = self.tour.copy()  # Copy tour just to be able to call distort().
             trip.distort(distortf)
         trip.kernel = self.kernel
+        trip.fixed_tour = self.fixed_tour
+        trip.fixed_xys = self.fixed_xys
         trip.fit()
         trip.calculate_tour()
         v = sum(trip.stds_simulated(TSxy)) + (0 if trip.feasible else 10000 * (trip.cost - trip.budget))
@@ -247,16 +250,11 @@ class Trip:
 
     def probe_next(self, f):
         """Reveal the value of the next point in the trip, passing it to the list of fixed (already visited) segments and to the list of points already known."""
-        idx = self.tour[1]
-        a, b = self.depot
-        c, d = self.xys[idx - 1]
-        spent = dist(a, b, c, d) + 1
-        self.budget -= spent
-        self.cost -= spent
-        self.depot = self.xys[idx - 1]
-        del self.xys[idx - 1]
+        first_moveable_idx = self.tour[1]
+        after_depot = self.xys[first_moveable_idx - 1]
+        del self.xys[first_moveable_idx - 1]
         self.first_xys.append(self.depot)
         self.first_zs.append(f(*self.depot))
-        self.tour.remove(idx)
+        self.tour.remove(first_moveable_idx)
         for i in range(0, len(self.tour)):
-            if self.tour[i] > idx: self.tour[i] -= 1
+            if self.tour[i] > first_moveable_idx: self.tour[i] -= 1
