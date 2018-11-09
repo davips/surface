@@ -17,7 +17,7 @@ from aux import tuplefy, probe, flat, current_milli_time
 from trip import Trip
 
 
-def swarm_distortion(trip, testset_xy, available_time, maxf=3000, maxit=3000, size=100):
+def swarm_distortion(trip, testset_xy, available_time, maxf=4000, maxit=4000, size=100):
     """Optimize points in trip via PSO, evaluating over a test set. The available time is almost never respected."""
     def py_outf(it, leader, fx, x):
         """Function called at every iteration. It is for logging purposes, but also to stop when a criterion is matched."""
