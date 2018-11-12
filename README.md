@@ -10,7 +10,7 @@ Copy gurobi folder (gurobi752 ?) to the current folder, if exact search is neede
 
 # usage example (linux bash)
 ```
-    run.sh  # Parameters are documented inside the script.
+    ./run.sh  # Parameters are documented inside the script.
 ```
 The program will output the total variance value, the total error among other values as a function of time.
 The kernel is selected by k-fold CV.
