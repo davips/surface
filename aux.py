@@ -21,6 +21,7 @@ from tsp import multistart_localsearch  # heuristic
 import time
 import itertools
 from numpy.random import normal, uniform, randint, seed
+from atsp import scf, sequence1
 
 ngrid = 100
 
@@ -120,6 +121,18 @@ def complete_cost(cost, n):
     return cost + n
 
 
+def tsp(n, c, cutoff):
+    model = scf(n, c)
+    model.Params.OutputFlag = 0  # silent mode
+    # model.Params.Cutoff = cutoff # Prints AttributeError: b"Unable to retrieve attribute 'X'"
+    model.Params.TimeLimit = 60
+    model.optimize()
+    cost = model.ObjVal
+    x, f = model.__data
+    arcs = [(i - 1, j - 1) for (i, j) in x if x[i, j].X > .5]
+    return cost, arcs
+
+
 def plan_tour(xys, budget, exact, fixed=[]):
     """
     Calculates a tour over all given points.
@@ -136,8 +149,7 @@ def plan_tour(xys, budget, exact, fixed=[]):
         for j in range(n):  # non optimized distance calculations!
             c[i, j] = dist(*pos[i], *pos[j])
             c[j, i] = c[i, j]
-
-    cost_is_optimal = False
+    cost_is_optimal_or_timeout = False
 
     if n > 2:
         # heuristic
@@ -150,24 +162,30 @@ def plan_tour(xys, budget, exact, fixed=[]):
         # exact
         if len(fixed) > 0 or cost > budget:
             if exact:
-                cost, edges = solve_tsp(range(n), c, False, fixed)
+                cost, edges = solve_tsp(range(n), c, False, fixed, 60000, budget - n)
+                # cost, edges = tsp(n, c, cutoff=budget - n)
                 cost = complete_cost(cost, n)
-                sol = sequence(range(n), edges)
-                cost_is_optimal = True
+                cost_is_optimal_or_timeout = True
+                try:
+                    sol = sequence(range(n), edges)
+                except ValueError:
+                    cost = 99999999
+                    sol = []
+                    # keeps cost_is_optimal_or_timeout=True to avoid adding more points in add_while_possible()
             else:
                 pass
                 print('# NOT trying exact solution')
     elif n == 1:
         cost = 0
         sol = [0]
-        cost_is_optimal = True
+        cost_is_optimal_or_timeout = True
     else:
         cost = dist(*pos[0], *pos[1])
         cost = complete_cost(cost, n)
         sol = [0, 1]
-        cost_is_optimal = True
+        cost_is_optimal_or_timeout = True
 
-    return sol, cost <= budget, cost, cost_is_optimal
+    return sol, cost <= budget, cost, cost_is_optimal_or_timeout
 
 
 def evalu_max(g, xys, zs):

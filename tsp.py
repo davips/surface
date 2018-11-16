@@ -26,8 +26,10 @@ from numpy.random import shuffle, uniform, seed
 import networkx
 from gurobipy import *
 
+def current_milli_time():
+    return int(round(time.time() * 1000))
 
-def solve_tsp(V, c, LOG=False, fixX=[]):
+def solve_tsp(V, c, LOG=False, fixX=[], time_limit=99999999, cutoff=9999999):
     """solve_tsp -- solve the traveling salesman problem 
        - start with assignment model
        - add cuts until there are no sub-cycles
@@ -35,6 +37,7 @@ def solve_tsp(V, c, LOG=False, fixX=[]):
         - V: set/list of nodes in the graph
         - c[i,j]: cost for traversing edge (i,j)
         - fixX: set/list of tuples (i,j) to keep fixed
+        - time_limit: in milisseconds
     Returns the optimum objective value and the list of edges used.
     """
 
@@ -53,8 +56,10 @@ def solve_tsp(V, c, LOG=False, fixX=[]):
 
     # main part of the solution process:
     model = Model("tsp")
+    if not LOG:
+        model.Params.OutputFlag = 0 # silent/verbose mode
+    model.Params.Cutoff = cutoff
 
-    # model.Params.OutputFlag = 0 # silent/verbose mode
     x = {}
     for i in V:
         for j in V:
@@ -68,14 +73,15 @@ def solve_tsp(V, c, LOG=False, fixX=[]):
     for i in V:
         model.addConstr(quicksum(x[j, i] for j in V if j < i) + \
                         quicksum(x[i, j] for j in V if j > i) == 2, "Degree(%s)" % i)
-
     model.setObjective(quicksum(c[i, j] * x[i, j] for i in V for j in V if j > i), GRB.MINIMIZE)
 
     if not LOG:
         model.Params.OutputFlag = 0  # silent mode
 
     EPS = 1.e-6
-    while True:
+    while time_limit > 0:
+        model.Params.TimeLimit = time_limit / 1000
+        start = current_milli_time()
         model.optimize()
         edges = []
         for (i, j) in x:
@@ -88,7 +94,8 @@ def solve_tsp(V, c, LOG=False, fixX=[]):
             for (i, j) in x:  # all components connected, switch to integer model
                 x[i, j].VType = "B"
             model.update()
-
+        elapsed = current_milli_time() - start
+        time_limit -= elapsed
     return model.ObjVal, edges
 
 
@@ -125,42 +132,42 @@ def sequence(V, edges):
             if j not in sol:
                 curr = j
                 break
-        else:  # no break
-            print(succ)
-            print(curr)
-            print(sol)
-            raise (Exception())
+        else:  # no break ( = no solution?)
+            # print(succ)
+            # print(curr)
+            # print(sol)
+            raise ValueError  # (Exception())
         sol.append(curr)
     return sol
 
 
-if __name__ == "__main__":
-    import sys
-
-    # Parse argument
-    if len(sys.argv) < 2:
-        print("Usage: %s instance" % sys.argv[0])
-        exit(1)
-        # n = 200
-        # seed = 1
-        # random.seed(seed)
-        # V,c = make_data(n)
-
-    from read_tsplib import read_tsplib
-
-    try:
-        V, c, x, y = read_tsplib(sys.argv[1])
-    except:
-        print("Cannot read TSPLIB file", sys.argv[1])
-        exit(1)
-
-    obj, edges = solve_tsp(V, c)
-
-    print()
-    print("Optimal tour:", edges)
-    print(sequence(list(sorted(V)), edges))
-    print("Optimal cost:", obj)
-    print()
+# if __name__ == "__main__":
+#     import sys
+#
+#     # Parse argument
+#     if len(sys.argv) < 2:
+#         print("Usage: %s instance" % sys.argv[0])
+#         exit(1)
+#         # n = 200
+#         # seed = 1
+#         # random.seed(seed)
+#         # V,c = make_data(n)
+#
+#     from read_tsplib import read_tsplib
+#
+#     try:
+#         V, c, x, y = read_tsplib(sys.argv[1])
+#     except:
+#         print("Cannot read TSPLIB file", sys.argv[1])
+#         exit(1)
+#
+#     obj, edges = solve_tsp(V, c)
+#
+#     print()
+#     print("Optimal tour:", edges)
+#     print(sequence(list(sorted(V)), edges))
+#     print("Optimal cost:", obj)
+#     print()
 
 # ================================== local search ======================================
 """

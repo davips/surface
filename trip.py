@@ -43,7 +43,7 @@ class Trip:
         self.pred_time = 0
         self.plotvar = False
         self.plotpred = False
-        self.cost_is_optimal = False
+        self.possibly_no_more_room_left = False
         self.feasible = False
         self.fixed_tour = []
         self.fixed_xys = []
@@ -73,9 +73,10 @@ class Trip:
             c, d = xys[tmptour[i + 1]]
             self.cost += dist(a, b, c, d)
 
-        self.cost_is_optimal = False
+        if self.budget - self.cost >= 1:
+            self.possibly_no_more_room_left = False
         if self.cost > self.budget or self.tour == [] or n != len(xys):
-            self.tour, self.feasible, self.cost, self.cost_is_optimal = plan_tour([self.depot] + self.fixed_xys + self.xys, self.budget, True, self.fixed_tour)
+            self.tour, self.feasible, self.cost, self.possibly_no_more_room_left = plan_tour([self.depot] + self.fixed_xys + self.xys, self.budget, True, self.fixed_tour)
 
         self.tour_time += current_milli_time() - start
 
@@ -119,7 +120,7 @@ class Trip:
         """Apply f() (to add a point) while the tour is feasible."""
         self.store()
         while True:
-            if self.cost_is_optimal and self.cost + 1 > self.budget:
+            if self.possibly_no_more_room_left and self.cost + 1 > self.budget:
                 self.restore()
                 break
             f()
