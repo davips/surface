@@ -162,13 +162,15 @@ def plan_tour(xys, budget, exact, fixed=[]):
         # exact
         if len(fixed) > 0 or cost > budget:
             if exact:
-                cost, edges = solve_tsp(range(n), c, False, fixed, 60000, budget - n)
+                print("# trying exact solution")
+                cost, edges = solve_tsp(range(n), c, False, fixed, 60000) # not using cutoff because it appears to be slow
                 # cost, edges = tsp(n, c, cutoff=budget - n)
                 cost = complete_cost(cost, n)
                 cost_is_optimal_or_timeout = True
                 try:
                     sol = sequence(range(n), edges)
                 except ValueError:
+                    print("# time out")
                     cost = 99999999
                     sol = []
                     # keeps cost_is_optimal_or_timeout=True to avoid adding more points in add_while_possible()

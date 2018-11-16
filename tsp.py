@@ -29,7 +29,7 @@ from gurobipy import *
 def current_milli_time():
     return int(round(time.time() * 1000))
 
-def solve_tsp(V, c, LOG=False, fixX=[], time_limit=99999999, cutoff=9999999):
+def solve_tsp(V, c, LOG=False, fixX=[], time_limit=99999999, cutoff=None):
     """solve_tsp -- solve the traveling salesman problem 
        - start with assignment model
        - add cuts until there are no sub-cycles
@@ -38,6 +38,7 @@ def solve_tsp(V, c, LOG=False, fixX=[], time_limit=99999999, cutoff=9999999):
         - c[i,j]: cost for traversing edge (i,j)
         - fixX: set/list of tuples (i,j) to keep fixed
         - time_limit: in milisseconds
+        - cutoff: maximum acceptable distance (using cutoff makes it slower)
     Returns the optimum objective value and the list of edges used.
     """
 
@@ -58,7 +59,8 @@ def solve_tsp(V, c, LOG=False, fixX=[], time_limit=99999999, cutoff=9999999):
     model = Model("tsp")
     if not LOG:
         model.Params.OutputFlag = 0 # silent/verbose mode
-    model.Params.Cutoff = cutoff
+    if cutoff is not None:
+        model.Params.Cutoff = cutoff
 
     x = {}
     for i in V:
