@@ -72,7 +72,7 @@ while acctime < time_limit * 3600000:
     total = now - start
     acctime += total
     other = total - trip.model_time - trip.pred_time - trip.tour_time
-    print('res:', acctime, fo(trip_var_min), fo(error), trip.model_time, trip.pred_time, trip.tour_time, other, total, len(trip.tour), str(trip2.kernel).replace(' ', '_'), fo(trip.budget), fo(trip.cost), trip.xys, trip.tour, sep='\t')
+    print('res:', acctime, fo(trip_var_min), fo(error), trip.model_time, trip.pred_time, trip.tour_time, other, total, len(trip.tour), str(trip2.kernel).replace(' ', '_'), fo(trip.budget), fo(trip.cost), trip.fixed_xys + trip.xys, trip.tour, sep='\t')
 
     # Plotting.
     if plot:
