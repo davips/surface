@@ -9,11 +9,12 @@ cd surface
 Copy gurobi folder (gurobi752 ?) to the current folder, if exact search is needed.
 
 # usage example (linux bash)
-Other parameters are set and documented inside the script.
+Other parameters are set and documented inside the script. 
 ```
-    ./run.sh off 100 1    # on = online (dynamic) mode. 100 = log after 100 iterations. 1 = time limit of 1h.
-    ./run.sh on 2000 9999 # [on]line (dynamic) or [off]line (static) mode. 100 = log after 100 iterations. 9999 = we hope the programs will end by itself.
+    ./run.sh off 100 1    # on = online (dynamic) mode. 100 = log after 100 iterations*. 1 = time limit of 1h.
+    ./run.sh on 2000 9999 # off = offline (static) mode. 2000 = probe and log after 2000 iterations*. 9999 = we hope the programs will end by itself.
 ```
+* -> A new iteration starts after 1/3 of failures.
 The program will output the total variance value, the total error among other values as a function of time.
 The kernel is selected by k-fold CV.
 
