@@ -10,12 +10,13 @@ Copy gurobi folder (gurobi752 ?) to the current folder, if exact search is neede
 
 # usage example (linux bash)
 ```
-    ./run.sh  # Parameters are documented inside the script.
+    ./run.sh off  # [on]line (dynamic) or [off]line (static) mode. Other parameters are set and documented inside the script.
 ```
 The program will output the total variance value, the total error among other values as a function of time.
 The kernel is selected by k-fold CV.
 
-The plot of the path or the surface of functions can be requested at the command line in the first argument:
+The plot of the path or the predicted surface of functions can be requested at the command line in the first argument
+[other arguments are explained inside run.sh]:
 ```
 python3 -u ocean.py plotvar ...
 python3 -u ocean.py plotpred ...
