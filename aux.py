@@ -159,7 +159,7 @@ def plan_tour(xys, budget, exact, fixed=[]):
             sol = sol_[idx:] + sol_[:idx]
             cost = complete_cost(cost, n)
 
-        # exact
+        # exact (or time out)
         if len(fixed) > 0 or cost > budget:
             if exact:
                 print("# trying exact solution")

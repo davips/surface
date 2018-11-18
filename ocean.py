@@ -22,7 +22,7 @@ from custom_distortion import custom_distortion, custom_distortion4
 from memory_profiler import profile
 
 # Process arguments.
-plot, seedval, time_limit, nb, side, budget, fnumber, alg, online = argv[1] == 'p', int(argv[2]), float(argv[3]), int(argv[4]), int(argv[5]), int(argv[6]), int(argv[7]), argv[8], argv[9] == 'on'
+plot, seedval, time_limit, nb, side, budget, fnumber, alg, online = argv[1].startswith('plot'), int(argv[2]), float(argv[3]), int(argv[4]), int(argv[5]), int(argv[6]), int(argv[7]), argv[8], argv[9] == 'on'
 switcher = {1: f1, 2: f2, 3: f3, 4: f4, 5: f5, 6: f6, 7: f7, 8: f8, 9: f9, 10: f10}
 f = switcher.get(fnumber)
 
@@ -32,7 +32,7 @@ seed(seedval)
 plotter = Plotter('surface') if plot else None
 
 # Create initial model with kernel selected by cross-validation.
-trip = Trip(depot, first_xys, first_zs, budget, plotter)
+trip = Trip(f, depot, first_xys, first_zs, budget, plotter)
 print('# selecting kernel...')
 trip.select_kernel()  # TOD
 print('# fitting...')
@@ -44,32 +44,30 @@ trip.fit()
 #                                        next iterations -> ...after probing [only for online mode] and next distortions; (conta > 2)
 conta, acctime = 0, 0
 trip_var_min = sum(trip.stds_simulated(TSxy))
+if argv[1] == 'plotvar': trip.plotvar = True
 while acctime < time_limit * 3600000:
     trip.tour_time, trip.model_time, trip.pred_time = 0, 0, 0
     start = current_milli_time()
 
-    # trip.plotvar = True
     if conta > 0: trip.add_while_possible(trip.add_maxvar_point(TSxy))
-
     if conta == 1:
         trip_var_min = sum(trip.stds_simulated(TSxy))
     elif conta > 1:
-        if online and conta > 2: trip.probe_next(f)
+        if online and conta > 2: trip.probe_next()
         if len(trip.xys) > 0:
             if alg == '1c': trip_var_min = custom_distortion(trip, TSxy, nb, random_distortion, nb / 3)
             if alg == 'sw': trip_var_min = swarm_distortion(trip, TSxy, time_limit * 3600000 - acctime - (current_milli_time() - start))
             if alg == 'ga': ga_distortion(trip, TSxy)
             if alg == 'a4': trip_var_min = custom_distortion4(trip, TSxy, nb, random_distortion, nb / 3)
-
     conta += 1
 
     # Logging.
     now = current_milli_time()
     print("# Inducing with real data to evaluate error...")
-    trip2 = Trip(depot, trip.first_xys, trip.first_zs, trip.budget, plotter) if online else Trip(depot, trip.first_xys + trip.xys, trip.first_zs + probe(f, trip.xys), trip.budget, plotter)
+    trip2 = Trip(f, depot, trip.first_xys, trip.first_zs, trip.budget, plotter) if online else Trip(f, depot, trip.first_xys + trip.xys, trip.first_zs + probe(f, trip.xys), trip.budget, plotter)
     # trip2.select_kernel()
     trip2.fit(trip.kernel, 10)
-    # trip2.plot_pred()
+    if argv[1] == 'plotpred': trip2.plot_pred()
     error = evalu_sum(trip2.model, TSxy, TSz)
     total = now - start
     acctime += total
@@ -80,11 +78,12 @@ while acctime < time_limit * 3600000:
     if plot:
         trip.plot_path()
     if len(trip.xys) == 0 and conta > 2: break
+
 print('# res:', trip.first_xys, trip.first_zs, sep='\t')
 print('# res:', trip.xys, sep='\t')
 print('# res:', trip.cost, trip.tour, sep='\t')
 for i in range(10):
-    trip2 = Trip(depot, trip.first_xys + trip.xys, trip.first_zs + probe(f, trip.xys), trip.budget, plotter)
+    trip2 = Trip(f, depot, trip.first_xys + trip.fixed_xys + trip.xys, trip.first_zs + probe(f, trip.fixed_xys + trip.xys), trip.budget)
     trip2.select_kernel()
     trip2.fit(n_restarts_optimizer=100)
     error = evalu_sum(trip2.model, TSxy, TSz)

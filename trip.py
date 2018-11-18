@@ -27,7 +27,8 @@ class Trip:
     budget -- max allowed distance + number of points
     """
 
-    def __init__(self, depot, first_xys, first_zs, budget, plotter=None):
+    def __init__(self, f, depot, first_xys, first_zs, budget, plotter=None):
+        self.f = f
         self.depot = depot
         self.first_xys = first_xys
         self.first_zs = first_zs
@@ -50,7 +51,7 @@ class Trip:
 
     def select_kernel(self):
         start = current_milli_time()
-        self.kernel = kernel_selector(self.first_xys, self.first_zs)
+        self.kernel = kernel_selector(self.first_xys + self.fixed_xys, self.first_zs + probe(self.f, self.fixed_xys))
         self.model_time += current_milli_time() - start
 
     def fit(self, kernel=None, n_restarts_optimizer=4):
@@ -58,13 +59,13 @@ class Trip:
         if kernel is None: kernel = self.kernel
         # self.model = GaussianProcessRegressor(kernel=RationalQuadratic(length_scale_bounds=(0.08, 100)) + WhiteKernel(noise_level_bounds=(1e-5, 1e-2)), n_restarts_optimizer=10)
         self.model = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=n_restarts_optimizer, copy_X_train=True)
-        self.model.fit(self.first_xys, self.first_zs)
+        self.model.fit(self.first_xys + self.fixed_xys, self.first_zs + probe(self.f, self.fixed_xys))
         self.model_time += current_milli_time() - start
 
     def calculate_tour(self):
         """ps. Keep the old tour if it's still within the budget and the number of cities remains compatible with the tour length."""
         start = current_milli_time()
-        xys = [self.depot] + self.xys
+        xys = [self.depot] + self.fixed_xys + self.xys
         n = len(self.tour)
         tmptour = self.tour + [0]
         self.cost, self.feasible = n, True
@@ -132,7 +133,7 @@ class Trip:
 
     def middle_insertion(self):
         """Add new point between two adjacent random points."""
-        points = [self.depot] + self.xys
+        points = ([self.depot] + self.fixed_xys)[-1] + self.xys
         ttt = list(zip(self.tour, self.tour[1:]))
         ida, idb = ttt[randint(len(ttt) - 1)]
         (a, b), (c, d) = points[ida], points[idb]
@@ -154,7 +155,7 @@ class Trip:
     def stds_simulated(self, xys):
         """Simulate probings using predicted values, induces a model and return std deviations."""
         zs = [] if len(self.xys) == 0 else self.predict(self.xys)
-        trip = Trip(self.depot, self.first_xys + self.xys, self.first_zs + list(zs), self.budget, self.plotter)
+        trip = Trip(self.f, self.depot, self.first_xys + self.fixed_xys + self.xys, self.first_zs + probe(self.f, self.fixed_xys) + list(zs), self.budget, self.plotter)
         trip.fit(self.kernel)
         stds = trip.predict_stds(xys)
         self.model_time += trip.model_time
@@ -176,15 +177,20 @@ class Trip:
     def add_random_point(self):
         self.xys.append((uniform(), uniform()))
 
-    def remove_at_random(self):
+    def remove_at_random(self): # TODO: not checked if it is still working now that it has self.fixed_xys
         idx = randint(len(self.xys))
         del self.xys[idx]
-        self.tour.remove(idx)
-        for i in range(0, len(self.tour)):
+        self.tour.remove(len(self.fixed_xys) + idx)
+        for i in range(0, len(self.fixed_xys + self.tour)):
             if self.tour[i] > idx: self.tour[i] -= 1
 
     def plot_path(self):
-        if self.plotter is not None: self.plotter.path([self.depot] + self.xys, self.tour)
+        if self.plotter is not None and len(self.tour) > 1:
+            k = len([self.depot] + self.fixed_xys)
+            tour = self.tour[k:] + [k - 1]
+            for i in range(len(tour)):
+                tour[i] -= k - 1
+            self.plotter.path([self.depot] + self.xys, tour)
 
     def plot_var(self):
         if self.plotter is not None: self.plotter.surface(lambda x, y: self.model.predict([(x, y)], return_std=True)[1][0], 30, 0, 1)
@@ -200,7 +206,7 @@ class Trip:
         trip.xys = xys.copy()
         if distortf != no_distortion:
             trip.tour = self.tour.copy()  # Copy tour just to be able to call distort().
-            trip.distort(distortf)
+            trip.distort(distortf)  # TODO: GA is using fitness() that calls distort() which is different from distort1b(); should have been a kind of distort1b() applicable to all points
         trip.kernel = self.kernel
         trip.fixed_tour = self.fixed_tour
         trip.fixed_xys = self.fixed_xys
@@ -214,14 +220,14 @@ class Trip:
 
     def distort(self, distortion_function):
         """Apply a custom distortion function to all points, except depot and last."""
-        points = [self.depot] + self.xys
+        points = ([self.depot] + self.fixed_xys)[-1] + self.xys
         for ida, idb, idc in zip(self.tour, self.tour[1:], self.tour[2:]):
             (a, b), (c, d), (e, f) = points[ida], points[idb], points[idc]
             self.xys[idb - 1] = distortion_function(a, b, c, d, e, f)
 
     def distort1(self, distortion_function):
         """Apply a custom distortion function to one random point between depot and last."""
-        points = [self.depot] + self.xys
+        points = ([self.depot] + self.fixed_xys)[-1] + self.xys
         ttt = list(zip(self.tour, self.tour[1:], self.tour[2:]))
         ida, idb, idc = ttt[randint(len(ttt) - 2)]
         (a, b), (c, d), (e, f) = points[ida], points[idb], points[idc]
@@ -233,29 +239,39 @@ class Trip:
         (a, b) = self.xys[idx]
         self.xys[idx] = distortion_function(a - 0.1, b, a, b, a + 0.1, b)
 
-    def old_probe_next(self, f):
-        """Reveal the value of the next point in the trip, passing it from the list of points to visit to the list of points already known. Depot also is changed. Budget is consumed."""
-        idx = self.tour[1]
-        a, b = self.depot
-        c, d = self.xys[idx - 1]
-        spent = dist(a, b, c, d) + 1
-        self.budget -= spent
-        self.cost -= spent
-        self.depot = self.xys[idx - 1]
-        del self.xys[idx - 1]
-        self.first_xys.append(self.depot)
-        self.first_zs.append(f(*self.depot))
-        self.tour.remove(idx)
-        for i in range(0, len(self.tour)):
-            if self.tour[i] > idx: self.tour[i] -= 1
+    def probe_next(self):
+        """Pass the next point in the trip to the list of fixed (already visited) points and update list of fixed segments."""
+        known = [self.depot] + self.fixed_xys
+        allps = known + self.xys
+        k = len(known)
+        next_probe_idx = self.tour[k]
+        xy = allps[next_probe_idx]
 
-    def probe_next(self, f):
-        """Reveal the value of the next point in the trip, passing it to the list of fixed (already visited) segments and to the list of points already known."""
-        first_moveable_idx = self.tour[1]
-        after_depot = self.xys[first_moveable_idx - 1]
-        del self.xys[first_moveable_idx - 1]
-        self.first_xys.append(self.depot)
-        self.first_zs.append(f(*self.depot))
-        self.tour.remove(first_moveable_idx)
-        for i in range(0, len(self.tour)):
-            if self.tour[i] > first_moveable_idx: self.tour[i] -= 1
+        # print()
+        # print(self.fixed_xys)
+        # print(self.xys)
+        # print(self.tour)
+        # print(self.fixed_tour)
+        # print('--------')
+
+        # move
+        del self.xys[next_probe_idx - k]
+        self.fixed_xys.append(xy)
+
+        # update tour
+        self.tour[k] = k
+        for i in range(k + 1, len(allps)):
+            if self.tour[i] < next_probe_idx: self.tour[i] += 1
+
+        # [0   1 2 5   3 4 6]
+        # [a] [b c]   [e f d g]
+        #
+        # [0   1 2 3   4 5 6]
+        # [a] [b c d] [e f   g]
+
+        self.fixed_tour.append((k - 1, k))
+
+        # print(self.fixed_xys)
+        # print(self.xys)
+        # print(self.tour)
+        # print(self.fixed_tour)
