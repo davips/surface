@@ -43,7 +43,7 @@ trip.fit()
 #                                        third iteration -> ...after first distortion; (conta == 2)
 #                                        next iterations -> ...after probing [only for online mode] and next distortions; (conta > 2)
 conta, acctime = 0, 0
-trip_var_min = sum(trip.stds_simulated(TSxy))
+trip_var = sum(trip.stds_simulated(TSxy))
 if argv[1] == 'plotvar': trip.plotvar = True
 while acctime < time_limit * 3600000:
     trip.tour_time, trip.model_time, trip.pred_time = 0, 0, 0
@@ -51,14 +51,14 @@ while acctime < time_limit * 3600000:
 
     if conta > 0: trip.add_while_possible(trip.add_maxvar_point(TSxy))
     if conta == 1:
-        trip_var_min = sum(trip.stds_simulated(TSxy))
+        trip_var = sum(trip.stds_simulated(TSxy))
     elif conta > 1:
         if online and conta > 2: trip.probe_next()
         if len(trip.xys) > 0:
-            if alg == '1c': trip_var_min = custom_distortion(trip, TSxy, nb, random_distortion, nb / 3)
-            if alg == 'sw': trip_var_min = swarm_distortion(trip, TSxy, time_limit * 3600000 - acctime - (current_milli_time() - start))
-            if alg == 'ga': ga_distortion(trip, TSxy)
-            if alg == 'a4': trip_var_min = custom_distortion4(trip, TSxy, nb, random_distortion, nb / 3)
+            if alg == '1c': trip_var = custom_distortion(trip, TSxy, nb, random_distortion, nb / 3)
+            if alg == 'sw': trip_var = swarm_distortion(trip, TSxy, time_limit * 3600000 - acctime - (current_milli_time() - start))
+            if alg == 'ga': trip_var = ga_distortion(trip, TSxy)
+            if alg == 'a4': trip_var = custom_distortion4(trip, TSxy, nb, random_distortion, nb / 3)
     conta += 1
 
     # Logging.
@@ -72,7 +72,7 @@ while acctime < time_limit * 3600000:
     total = now - start
     acctime += total
     other = total - trip.model_time - trip.pred_time - trip.tour_time
-    print('res:', acctime, fo(trip_var_min), fo(error), trip.model_time, trip.pred_time, trip.tour_time, other, total, len(trip.tour), str(trip2.kernel).replace(' ', '_'), fo(trip.budget), fo(trip.cost), trip.fixed_xys + trip.xys, trip.tour, sep='\t')
+    print('res:', acctime, fo(trip_var), fo(error), trip.model_time, trip.pred_time, trip.tour_time, other, total, len(trip.tour), str(trip2.kernel).replace(' ', '_'), fo(trip.budget), fo(trip.cost), trip.fixed_xys + trip.xys, trip.tour, sep='\t')
 
     # Plotting.
     if plot:

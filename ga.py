@@ -84,3 +84,4 @@ def ga_distortion(trip, testset_xy):
             best = i
             vmin = v
     trip.xys = probings[best].copy()
+    return vmin
