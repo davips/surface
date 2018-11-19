@@ -202,7 +202,7 @@ class Trip:
         """Return "total" variance of a given solution xys for a given test set.
            May sum up time elapsed across different threads (e.g. when used inside swarm.py).
         """
-        trip = Trip(self.depot, self.first_xys, self.first_zs, self.budget)
+        trip = Trip(self.f, self.depot, self.first_xys, self.first_zs, self.budget)
         trip.xys = xys.copy()
         if distortf != no_distortion:
             trip.tour = self.tour.copy()  # Copy tour just to be able to call distort().
