@@ -55,10 +55,10 @@ while acctime < time_limit * 3600000:
     elif conta > 1:
         if online and conta > 2: trip.probe_next()
         if len(trip.xys) > 0:
-            if alg == '1c': trip_var = custom_distortion(trip, TSxy, nb, random_distortion, nb / 3)
+            if alg == '1c': trip_var = custom_distortion(trip, TSxy, nb, random_distortion)
             if alg == 'sw': trip_var = swarm_distortion(trip, TSxy, time_limit * 3600000 - acctime - (current_milli_time() - start))
             if alg == 'ga': trip_var = ga_distortion(trip, TSxy)
-            if alg == 'a4': trip_var = custom_distortion4(trip, TSxy, nb, random_distortion, nb / 3)
+            if alg == 'a4': trip_var = custom_distortion4(trip, TSxy, nb, random_distortion)
     conta += 1
 
     # Logging.
