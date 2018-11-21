@@ -242,10 +242,10 @@ class Trip:
     def probe_next(self):
         """Pass the next point in the trip to the list of fixed (already visited) points and update list of fixed segments."""
         known = [self.depot] + self.fixed_xys
-        allps = known + self.xys
+        allpoints = known + self.xys
         k = len(known)
         next_probe_idx = self.tour[k]
-        xy = allps[next_probe_idx]
+        xy = allpoints[next_probe_idx]
 
         # print()
         # print(self.fixed_xys)
@@ -260,7 +260,7 @@ class Trip:
 
         # update tour
         self.tour[k] = k
-        for i in range(k + 1, len(allps)):
+        for i in range(k + 1, len(allpoints)):
             if self.tour[i] < next_probe_idx: self.tour[i] += 1
 
         # [0   1 2 5   3 4 6]
