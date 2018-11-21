@@ -64,9 +64,9 @@ while acctime < time_limit * 3600000:
     # Logging.
     now = current_milli_time()
     print("# Inducing with real data to evaluate error...")
-    trip2 = Trip(f, depot, trip.first_xys + trip.fixed_xys + trip.xys, trip.first_zs + probe(f, trip.fixed_xys + trip.xys), trip.budget, plotter)
+    trip2 = Trip(f, depot, trip.first_xys + trip.fixed_xys + trip.xys, trip.first_zs + probe(f, trip.fixed_xys + trip.xys), trip.budget, plotter, seedval)
     # trip2.select_kernel()
-    trip2.fit(trip.kernel, 10)
+    trip2.fit(trip.kernel, 100)
     if argv[1] == 'plotpred': trip2.plot_pred()
     error = evalu_sum(trip2.model, TSxy, TSz)
     total = now - start

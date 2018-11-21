@@ -27,7 +27,7 @@ class Trip:
     budget -- max allowed distance + number of points
     """
 
-    def __init__(self, f, depot, first_xys, first_zs, budget, plotter=None):
+    def __init__(self, f, depot, first_xys, first_zs, budget, plotter=None, seedval=None):
         self.f = f
         self.depot = depot
         self.first_xys = first_xys
@@ -48,6 +48,7 @@ class Trip:
         self.feasible = False
         self.fixed_tour = []
         self.fixed_xys = []
+        self.seed = seedval
 
     def select_kernel(self):
         start = current_milli_time()
@@ -58,7 +59,7 @@ class Trip:
         start = current_milli_time()
         if kernel is None: kernel = self.kernel
         # self.model = GaussianProcessRegressor(kernel=RationalQuadratic(length_scale_bounds=(0.08, 100)) + WhiteKernel(noise_level_bounds=(1e-5, 1e-2)), n_restarts_optimizer=10)
-        self.model = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=n_restarts_optimizer, copy_X_train=True)
+        self.model = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=n_restarts_optimizer, copy_X_train=True, random_state=self.seedval)
         self.model.fit(self.first_xys + self.fixed_xys, self.first_zs + probe(self.f, self.fixed_xys))
         self.model_time += current_milli_time() - start
 
@@ -177,7 +178,7 @@ class Trip:
     def add_random_point(self):
         self.xys.append((uniform(), uniform()))
 
-    def remove_at_random(self): # TODO: not checked if it is still working now that it has self.fixed_xys
+    def remove_at_random(self):  # TODO: not checked if it is still working now that it has self.fixed_xys
         idx = randint(len(self.xys))
         del self.xys[idx]
         self.tour.remove(len(self.fixed_xys) + idx)
