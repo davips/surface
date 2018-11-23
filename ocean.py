@@ -20,15 +20,27 @@ from swarm import swarm_distortion
 from ga import ga_distortion
 from custom_distortion import custom_distortion, custom_distortion4
 from memory_profiler import profile
+import ast
+import time
 
 # Process arguments.
-plot, seedval, time_limit, nb, side, budget, fnumber, alg, online = argv[1].startswith('plot'), int(argv[2]), float(argv[3]), int(argv[4]), int(argv[5]), int(argv[6]), int(argv[7]), argv[8], argv[9] == 'on'
+fidx, sideidx = (7, 5) if argv[1] != "view" else (2, 3)
+fnumber = int(argv[fidx])
 switcher = {1: f1, 2: f2, 3: f3, 4: f4, 5: f5, 6: f6, 7: f7, 8: f8, 9: f9, 10: f10}
-f = switcher.get(fnumber)
+f, side = switcher.get(fnumber), int(argv[sideidx])
+(first_xys, first_zs) = train_data(side, f, False)
+if argv[1] == "view":
+    points = first_xys + ast.literal_eval(argv[4])
+    trip = Trip(f, (0, 0), points, probe(f, points), 100, Plotter('surface'), 0)
+    trip.select_kernel()
+    trip.fit(n_restarts_optimizer=100)
+    trip.plot_pred(argv[5])
+    exit(0)
+plot, seedval, time_limit, nb, budget, alg, online = argv[1].startswith('plot'), int(argv[2]), float(argv[3]), int(argv[4]), int(argv[6]), argv[8], argv[9] == 'on'
 
 # Initial settings.
 seed(seedval)
-(first_xys, first_zs), (TSxy, TSz), depot, max_failures = train_data(side, f, False), test_data(f), (-0.00001, -0.00001), math.ceil(nb / 5)
+(TSxy, TSz), depot, max_failures = test_data(f), (-0.00001, -0.00001), math.ceil(nb / 5)
 plotter = Plotter('surface') if plot else None
 
 # Create initial model with kernel selected by cross-validation.
@@ -64,15 +76,25 @@ while acctime < time_limit * 3600000:
     # Logging.
     now = current_milli_time()
     print("# Inducing with real data to evaluate error...")
+    erroron = -1
+    if online:
+        trip3 = Trip(f, depot, trip.first_xys + trip.fixed_xys, trip.first_zs + probe(f, trip.fixed_xys), trip.budget, plotter, seedval)
+        trip3.select_kernel()
+        trip3.fit(n_restarts_optimizer=100)
+        if argv[1] == 'plotpred': trip3.plot_pred()
+        erroron = evalu_sum(trip3.model, TSxy, TSz)
+
     trip2 = Trip(f, depot, trip.first_xys + trip.fixed_xys + trip.xys, trip.first_zs + probe(f, trip.fixed_xys + trip.xys), trip.budget, plotter, seedval)
     # trip2.select_kernel()
     trip2.fit(trip.kernel, 100)
-    if argv[1] == 'plotpred': trip2.plot_pred()
-    error = evalu_sum(trip2.model, TSxy, TSz)
+    if not online and argv[1] == 'plotpred': trip2.plot_pred()
+    erroroff = evalu_sum(trip2.model, TSxy, TSz)
+
     total = now - start
     acctime += total
     other = total - trip.model_time - trip.pred_time - trip.tour_time
-    print('res:', acctime, fo(trip_var), fo(error), trip.model_time, trip.pred_time, trip.tour_time, other, total, len(trip.tour), str(trip2.kernel).replace(' ', '_'), fo(trip.budget), fo(trip.cost), trip.fixed_xys + trip.xys, trip.tour, sep='\t')
+    error = erroron if online else erroroff
+    print('res:', acctime, fo(trip_var), fo(error), trip.model_time, trip.pred_time, trip.tour_time, other, total, len(trip.tour), str(trip2.kernel).replace(' ', '_'), fo(erroroff), fo(trip.cost), trip.fixed_xys + trip.xys, trip.tour, sep='\t')
 
     # Plotting.
     if plot:

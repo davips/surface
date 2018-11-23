@@ -7,7 +7,7 @@
     \def \grida {\sidea x\sidea}
     \def \gridb {\sideb x\sideb}
     \def \gridc {\sidec x\sidec}
-    \def \a {1c-999999.on}\def\aname{Distortion~\grida} \def \b {1c-999999.on}\def\bname{Distortion~\gridb} \def \c {1c-999999.on}
+    \def \a {1c-999999.on}\def\aname{Distortion~\grida} \def \b {1c-999999.on}\def\bname{Distortion~\gridb} \def \c {1c-999999.on} \def\cname{Distortion~\gridc}
     \def \f {f\number\tmp} \def \seed {0} \def \pula {1}
     \begin{tikzpicture}
         \pgfplotsset{scale only axis}
@@ -33,8 +33,8 @@
             \addlegendimage{/pgfplots/refstyle=c}\addlegendentry{\cname variance}
             \addplot [each nth point={\pula}, mark=*, mark repeat=10, mark options={solid}, black!30!green, dotted, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {3}] {\f-\seed-\gridc-\budget-\c.log}; \addlegendentry{\cname error}
 
-            %            \addlegendimage{/pgfplots/refstyle=c}\addlegendentry{\c best variance}
-            %            \addplot [each nth point={\pula}, mark=triangle, mark repeat=10, mark options={solid}, black, dotted, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {4}] {\f-\seed-\grid-\budget-\c.log}; \addlegendentry{\c error}
+            \addlegendimage{/pgfplots/refstyle=c}\addlegendentry{\c best variance}
+            \addplot [each nth point={\pula}, mark=triangle, mark repeat=10, mark options={solid}, black, dotted, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {4}] {\f-\seed-\grid-\budget-\c.log}; \addlegendentry{\c error}
         \end{axis}
         \node [above=8.5cm, align=flush center,text width=5cm]  {\f, seed \seed, \grida, \gridb, budget \budget};
     \end{tikzpicture}

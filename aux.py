@@ -244,6 +244,8 @@ def p(plt, fig, f, n, zmin, zmax, filename=None):
     pl = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.coolwarm, linewidth=0.05, antialiased=False)
     # plt.show()
     fig.canvas.flush_events()  # update the plot and take care of window events (like resizing etc.)
+    if filename is not None:
+        plt.savefig(filename)
     # time.sleep(0.2)
     pl.remove()
 

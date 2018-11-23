@@ -193,11 +193,11 @@ class Trip:
                 tour[i] -= k - 1
             self.plotter.path([self.depot] + self.xys, tour)
 
-    def plot_var(self):
-        if self.plotter is not None: self.plotter.surface(lambda x, y: self.model.predict([(x, y)], return_std=True)[1][0], 30, 0, 1)
+    def plot_var(self, filename=None):
+        if self.plotter is not None: self.plotter.surface(lambda x, y: self.model.predict([(x, y)], return_std=True)[1][0], 30, 0, 1, filename)
 
-    def plot_pred(self):
-        if self.plotter is not None: self.plotter.surface(lambda x, y: self.model.predict([(x, y)])[0], 30, 0, 50)
+    def plot_pred(self, filename=None):
+        if self.plotter is not None: self.plotter.surface(lambda x, y: self.model.predict([(x, y)])[0], 30, 0, 100, filename)
 
     def fitness(self, xys, TSxy, distortf=no_distortion):
         """Return "total" variance of a given solution xys for a given test set.
