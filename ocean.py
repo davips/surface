@@ -24,6 +24,17 @@ import ast
 import time
 
 # Process arguments.
+if len(argv) > 1 and argv[1] == "view":
+    if len(argv) is not 6:
+        print('5 arguments expected: python3 ocean.py view [function number] [grid side] "[list of points]" [file name]\nExample: python3 ocean.py view 5 7 "[(1, 2), (3, 4)]" plot.png')
+        print('Alternatively,\nSee file run.sh for a different usage like below.')
+        print("9 arguments expected: python3 ocean.py [plot mode] [seed] [time limit] [iteractions] [grid side] [budget] [function number] [algorithm] [on/off line mode]\nSee file run.sh for examples of use.")
+        exit(0)
+else:
+    if len(argv) is not 10:
+        print("9 arguments expected: python3 ocean.py [plot mode] [seed] [time limit] [iteractions] [grid side] [budget] [function number] [algorithm] [on/off line mode]\nSee file run.sh for examples of use.")
+        print('Alternatively,\n5 arguments expected: python3 ocean.py view [function number] [grid side] "[list of points]" [file name]\nExample: python3 ocean.py view 5 7 "[(1, 2), (3, 4)]" plot.png')
+        exit(0)
 fidx, sideidx = (7, 5) if argv[1] != "view" else (2, 3)
 fnumber = int(argv[fidx])
 switcher = {1: f1, 2: f2, 3: f3, 4: f4, 5: f5, 6: f6, 7: f7, 8: f8, 9: f9, 10: f10}
