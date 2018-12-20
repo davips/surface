@@ -12,5 +12,6 @@ for algorithm in `echo 1c sw`; do    # sw = Particle Swarm Optmization (PSO para
       time python3 -u ocean.py dontplot $seed $timelimit $logafter $gridsize $budget $function $algorithm $mode 2> >(grep --line-buffered -v gaussian_process | grep --line-buffered -v np.newaxis | grep --line-buffered -v convergence_dict | grep --line-buffered -v warnings.warn) | grep --line-buffered res: | tee f$function-$seed-${gridsize}x$gridsize-$budget-$algorithm-$timelimit.$mode.log
     done
   done
+  sleep 36000
 done
 
