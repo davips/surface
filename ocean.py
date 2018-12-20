@@ -51,7 +51,7 @@ plot, seedval, time_limit, nb, budget, alg, online = argv[1].startswith('plot'),
 
 # Initial settings.
 seed(seedval)
-(TSxy, TSz), depot, max_failures = test_data(f), (-0.00001, -0.00001), math.ceil(nb / 5)
+(TSxy, TSz), depot = test_data(f), (-0.00001, -0.00001)
 plotter = Plotter('surface') if plot else None
 
 # Create initial model with kernel selected by cross-validation.
@@ -89,11 +89,17 @@ while acctime < time_limit * 3600000:
     print("# Inducing with real data to evaluate error...")
     erroron = -1
     if online:
-        trip3 = Trip(f, depot, trip.first_xys + trip.fixed_xys, trip.first_zs + probe(f, trip.fixed_xys), trip.budget, plotter, seedval)
-        trip3.select_kernel()
-        trip3.fit(n_restarts_optimizer=100)
-        if argv[1] == 'plotpred': trip3.plot_pred()
-        erroron = evalu_sum(trip3.model, TSxy, TSz)
+        erroron = 0
+        errors = {}
+        for i in range(10):
+            trip4 = Trip(f, depot, trip.first_xys + trip.fixed_xys, trip.first_zs + probe(f, trip.fixed_xys), trip.budget, plotter, seedval + i)
+            trip4.select_kernel()
+            trip4.fit(n_restarts_optimizer=100)
+            err = evalu_sum(trip4.model, TSxy, TSz)
+            erroron += err
+            errors.append(err)
+        erroron /= 10.0
+        if argv[1] == 'plotpred': trip4.plot_pred()
 
     trip2 = Trip(f, depot, trip.first_xys + trip.fixed_xys + trip.xys, trip.first_zs + probe(f, trip.fixed_xys + trip.xys), trip.budget, plotter, seedval)
     # trip2.select_kernel()
@@ -105,7 +111,7 @@ while acctime < time_limit * 3600000:
     acctime += total
     other = total - trip.model_time - trip.pred_time - trip.tour_time
     error = erroron if online else erroroff
-    print('res:', acctime, fo(trip_var), fo(error), trip.model_time, trip.pred_time, trip.tour_time, other, total, len(trip.tour), str(trip2.kernel).replace(' ', '_'), fo(erroroff), fo(trip.cost), trip.fixed_xys + trip.xys, trip.tour, sep='\t')
+    print('res:', acctime, fo(trip_var), fo(error), trip.model_time, trip.pred_time, trip.tour_time, other, errors, len(trip.tour), str(trip2.kernel).replace(' ', '_'), fo(erroroff), fo(trip.cost), trip.fixed_xys + trip.xys, trip.tour, sep='\t')
 
     # Plotting.
     if plot:
