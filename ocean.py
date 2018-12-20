@@ -89,7 +89,7 @@ while acctime < time_limit * 3600000:
     erroron = -1
     if online:
         erroron = 0
-        errors = {}
+        errors = []
         for i in range(10):
             trip4 = Trip(f, depot, trip.first_xys + trip.fixed_xys, trip.first_zs + probe(f, trip.fixed_xys), trip.budget, plotter, seedval + i)
             trip4.select_kernel()
