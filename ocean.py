@@ -19,7 +19,6 @@ from trip import Trip
 from swarm import swarm_distortion
 from ga import ga_distortion
 from custom_distortion import custom_distortion, custom_distortion4
-from memory_profiler import profile
 import ast
 import time
 
