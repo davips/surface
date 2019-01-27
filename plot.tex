@@ -7,7 +7,7 @@
     \def \grida {\sidea x\sidea}
     \def \gridb {\sideb x\sideb}
     \def \gridc {\sidec x\sidec}
-    \def \a {1c-999999.on}\def\aname{Distortion~\grida} \def \b {1c-999999.on}\def\bname{Distortion~\gridb} \def \c {1c-999999.on} \def\cname{Distortion~\gridc}
+    \def \a {1c-999999.on.5000}\def\aname{Dynamic~\grida} \def \b {1c-999999.on.5000}\def\bname{Dynamic~\gridb} \def \c {1c-999999.on.5000} \def\cname{Dynamic~\gridc}
     \def \f {f\number\tmp} \def \seed {0} \def \pula {1}
     \begin{tikzpicture}
         \pgfplotsset{scale only axis}
@@ -19,7 +19,7 @@
 %            \addplot [each nth point={\pula}, no marks, black!30!green, dashed, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {2}] {\f-\seed-\grid-\budget-\b.log};
             \addplot [each nth point={\pula}, mark=x, mark repeat=10, mark options={solid}, black!30!green] table [header=false, x expr=\coordindex, y index = {2}] {\f-\seed-\gridb-\budget-\b.log}; \label{b}
 
-            \addplot [each nth point={\pula}, mark=*, mark repeat=10, mark options={solid}, black!30!green] table [header=false, x expr=\coordindex, y index = {2}] {\f-\seed-\gridc-\budget-\c.log}; \label{c}
+            \addplot [each nth point={\pula}, mark=*, mark repeat=10, mark options={solid}, black!30!red] table [header=false, x expr=\coordindex, y index = {2}] {\f-\seed-\gridc-\budget-\c.log}; \label{c}
 
             %            \addplot [each nth point={\pula}, no marks, black, dashed, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {2}] {\f-\seed-\grid-\budget-\c.log};
             %            \addplot [each nth point={\pula}, mark=triangle, mark repeat=10, mark options={solid}, black] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {3}] {\f-\seed-\grid-\budget-\c.log}; \label{c}
@@ -32,7 +32,7 @@
             \addplot [each nth point={\pula}, mark=x, mark repeat=10, mark options={solid}, black!30!green, dotted, thick] table [header=false, x expr=\coordindex, y index = {3}] {\f-\seed-\gridb-\budget-\b.log}; \addlegendentry{\bname error}
 
             \addlegendimage{/pgfplots/refstyle=c}\addlegendentry{\cname variance}
-            \addplot [each nth point={\pula}, mark=*, mark repeat=10, mark options={solid}, black!30!green, dotted, thick] table [header=false, x expr=\coordindex, y index = {3}] {\f-\seed-\gridc-\budget-\c.log}; \addlegendentry{\cname error}
+            \addplot [each nth point={\pula}, mark=*, mark repeat=10, mark options={solid}, black!30!red, dotted, thick] table [header=false, x expr=\coordindex, y index = {3}] {\f-\seed-\gridc-\budget-\c.log}; \addlegendentry{\cname error}
 
 %            \addlegendimage{/pgfplots/refstyle=c}\addlegendentry{\c best variance}
 %            \addplot [each nth point={\pula}, mark=triangle, mark repeat=10, mark options={solid}, black, dotted, thick] table [header=false, x expr={\thisrowno{1}/3600000}, y index = {4}] {\f-\seed-\grid-\budget-\c.log}; \addlegendentry{\c error}
