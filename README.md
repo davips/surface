@@ -1,5 +1,5 @@
 # surface
-Optimization and machine learning for sea bed exploration
+Optimization and machine learning for sea bed exploration base don gaussian processes
 
 # install
 ```
